@@ -1,650 +1,289 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Latein-Arena</title>
-<meta name="robots" content="noindex, nofollow">
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Nunito:wght@400;600;700;800&display=swap">
 <style>
-/* Layout: one centered column like a Roman wax-tablet; mosaic band under the header; stations as a tile grid. */
-:root{
-  --bg:#eceff4; --surface:#ffffff; --surface-2:#e2e7ef; --ink:#1a2132; --muted:#58637a; --line:#cdd4e0;
-  --accent:#2446a6; --accent-ink:#ffffff; --accent-soft:#dce4f8;
-  --gold:#a86c08; --gold-bright:#d99a1e; --gold-soft:#f6e8c8;
-  --ok:#21734a; --ok-soft:#d9f0e2; --bad:#b0352a; --bad-soft:#f8dfda;
-  --font-d:'Cinzel', 'Trajan Pro', Georgia, serif;
-  --font-b:'Nunito', 'Segoe UI', system-ui, sans-serif;
-}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0f131c; --surface:#181e2b; --surface-2:#222a3b; --ink:#e8ecf4; --muted:#9aa5bb; --line:#2f3950;
-  --accent:#86a2ff; --accent-ink:#0c1120; --accent-soft:#24325a;
-  --gold:#e8b450; --gold-bright:#e8b450; --gold-soft:#3a2f17;
-  --ok:#62d093; --ok-soft:#173526; --bad:#ff8c7c; --bad-soft:#3e1f1b; color-scheme:dark;}}
-:root[data-theme="dark"]{
-  --bg:#0f131c; --surface:#181e2b; --surface-2:#222a3b; --ink:#e8ecf4; --muted:#9aa5bb; --line:#2f3950;
-  --accent:#86a2ff; --accent-ink:#0c1120; --accent-soft:#24325a;
-  --gold:#e8b450; --gold-bright:#e8b450; --gold-soft:#3a2f17;
-  --ok:#62d093; --ok-soft:#173526; --bad:#ff8c7c; --bad-soft:#3e1f1b; color-scheme:dark;}
-
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:16px;line-height:1.5}
+:root{--bg:#faf7f2;--card:#fff;--tx:#2a2420;--mu:#7a6f66;--ac:#8c2f39;--gold:#c99a2e;--ok:#16a34a;--ko:#dc2626;--bd:#e3dcd2;--hl:#fde68a;
+--L-S:#2563eb;--L-P:#c026d3;--L-AO:#0d9488;--L-AB:#ea580c;--L-GA:#7c3aed;--L-INF:#a16207;--L-K:#6b7280}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1917;--card:#292524;--tx:#f3ece4;--mu:#a89f95;--ac:#e07a85;--gold:#f0c35a;--ok:#4ade80;--ko:#f87171;--bd:#44403c;--hl:#713f12;
+--L-S:#60a5fa;--L-P:#e879f9;--L-AO:#2dd4bf;--L-AB:#fb923c;--L-GA:#a78bfa;--L-INF:#facc15;--L-K:#a8a29e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1c1917;--card:#292524;--tx:#f3ece4;--mu:#a89f95;--ac:#e07a85;--gold:#f0c35a;--ok:#4ade80;--ko:#f87171;--bd:#44403c;--hl:#713f12;
+--L-S:#60a5fa;--L-P:#e879f9;--L-AO:#2dd4bf;--L-AB:#fb923c;--L-GA:#a78bfa;--L-INF:#facc15;--L-K:#a8a29e;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+main{max-width:680px;margin:0 auto;padding:12px 16px 140px}
+h1{margin:4px 0 0;font:700 28px Georgia,serif;color:var(--ac)}
+.sub{color:var(--mu);font-size:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:16px;margin:12px 0}
+.hide{display:none!important}
 button{font:inherit;color:inherit;cursor:pointer}
-button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.wrap{max-width:780px;margin:0 auto;padding-block:18px 56px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.big{display:block;width:100%;padding:13px;border:0;border-radius:12px;background:var(--ac);color:#fff;font-weight:700;font-size:16px;margin-top:10px}
+.big:disabled{opacity:.45;cursor:default}
+.ghost{background:transparent;border:1px solid var(--bd);color:var(--tx);font-weight:600}
+/* Rang */
+.rank{display:flex;align-items:center;gap:12px}
+.rank .ico{font-size:38px}
+.rank b{font-size:18px}
+.bar{height:8px;background:var(--bd);border-radius:9px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--ac));transition:width .5s}
+/* Kacheln */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{text-align:left;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;min-height:118px;position:relative;transition:transform .1s}
+.tile:active{transform:scale(.97)}
+.tile .e{font-size:30px}.tile b{display:block;margin-top:4px}.tile span{font-size:13px;color:var(--mu)}
+.tile.star{grid-column:1/-1;border:2px solid var(--ac);background:color-mix(in srgb,var(--ac) 8%,var(--card))}
+.tile .badge{position:absolute;top:10px;right:10px;background:var(--ac);color:#fff;border-radius:99px;font-size:12px;padding:1px 8px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{font-size:13px;padding:6px 11px;border-radius:99px;border:1px solid var(--bd);background:var(--bg)}
+.chip.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+/* Spiel-Kopf */
+.top{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--mu);gap:8px}
+.top .home{border:0;background:none;font-size:22px;padding:0 4px}
+.streak{font-weight:700;color:var(--gold)}
+.cat{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-top:10px}
+.q{font-size:19px;margin:6px 0 10px;font-weight:600}
+.opt{display:block;width:100%;text-align:left;padding:12px 14px;margin:8px 0;border-radius:12px;border:2px solid var(--bd);background:var(--bg)}
+.opt.ok{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 16%,transparent)}
+.opt.ok::after{content:" ✓";color:var(--ok);font-weight:700}
+.opt.ko{border-color:var(--ko);background:color-mix(in srgb,var(--ko) 16%,transparent);text-decoration:line-through}
+.opt.ko::after{content:" ✗";color:var(--ko);font-weight:700}
+.fb{margin-top:12px;padding:12px;border-radius:12px;font-size:15px}
+.fb.good{background:color-mix(in srgb,var(--ok) 14%,transparent);border-left:4px solid var(--ok)}
+.fb.bad{background:color-mix(in srgb,var(--ko) 12%,transparent);border-left:4px solid var(--ko)}
+/* Satz */
+.sent{font:21px/1 Georgia,"Times New Roman",serif;display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 0;margin:14px 0 6px}
+.grp{display:inline-flex;flex-wrap:wrap;border-radius:12px}
+.showgrp .grp{outline:2px dashed var(--mu);outline-offset:-1px;margin:0 3px}
+.wd{display:inline-flex;flex-direction:column;align-items:center;min-width:24px;margin:0 2px}
+.wd .tp{font:700 11px system-ui;height:15px;line-height:15px;white-space:nowrap}
+.w{border:0;background:none;font:inherit;padding:6px 4px 9px;margin:0;border-radius:8px;color:var(--tx);min-height:44px}
+.w.sel{background:color-mix(in srgb,var(--c) 14%,transparent)}
+.wd .tg{font:700 11px system-ui;color:var(--c,var(--mu));min-height:15px;white-space:nowrap}
+.punct{font:21px Georgia,serif;align-self:flex-start;padding-top:22px;margin-left:-4px}
+.wd.ko .w{background:color-mix(in srgb,var(--ko) 16%,transparent);outline:2px solid var(--ko)}
+.wd.ok .w{background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.wd.ko .tp{color:var(--ko);text-decoration:line-through}
+.wd.ok .tp{color:var(--ok)}
+.shake{animation:sh .35s}@keyframes sh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pop{animation:pp .25s}@keyframes pp{50%{transform:scale(1.15)}}
+.blitzword{background:var(--hl);border-radius:6px;padding:1px 3px;font-weight:700}
+.plain{font:20px/1.8 Georgia,serif;margin:10px 0}
+/* Markierungen (wie im Unterricht) */
+.m-S{text-decoration:underline solid var(--c);text-decoration-thickness:3px;text-underline-offset:7px}
+.m-P{text-decoration:underline double var(--c);text-decoration-thickness:2px;text-underline-offset:7px}
+.m-AO{text-decoration:underline dashed var(--c);text-decoration-thickness:3px;text-underline-offset:7px}
+.m-AB{text-decoration:underline wavy var(--c);text-decoration-thickness:2px;text-underline-offset:6px}
+.m-GA{text-decoration:underline solid var(--c);text-decoration-thickness:2px;text-underline-offset:7px;background-image:repeating-linear-gradient(90deg,var(--c) 0 2px,transparent 2px 8px);background-size:100% 9px;background-position:0 calc(100% - 1px);background-repeat:no-repeat}
+.m-INF{text-decoration:underline dotted var(--c);text-decoration-thickness:3px;text-underline-offset:7px}
+.m-K{outline:2px solid var(--c);border-radius:999px!important}
+/* Palette */
+.pal{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--bd);padding:8px 10px calc(8px + env(safe-area-inset-bottom));z-index:5;box-shadow:0 -6px 20px rgba(0,0,0,.08)}
+.pal .in{max-width:680px;margin:0 auto}
+.pal .hint{font-size:12px;color:var(--mu);text-align:center;margin-bottom:6px}
+.pbtns{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pb{border:2px solid var(--c);background:var(--bg);border-radius:10px;padding:6px 2px;font-size:12px;line-height:1.15;color:var(--tx)}
+.pb b{display:block;color:var(--c);font-size:15px}
+.pb.on{background:var(--c);color:#fff}.pb.on b{color:#fff}
+.pb.era{--c:var(--mu)}
+.acts{display:flex;gap:8px}.acts button{flex:1}
+.err{display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--bd);font-size:15px}
+.err:first-child{border-top:0}
+.lt{display:inline-block;border-radius:6px;padding:0 6px;color:#fff;font-weight:700;font-size:13px;background:var(--c)}
+.lt.x{background:var(--ko);text-decoration:line-through}
+.stars{font-size:34px;text-align:center;letter-spacing:6px;margin:6px 0}
+.de{font-style:italic;color:var(--mu);margin-top:8px}
+/* Spickzettel */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9;display:flex;align-items:flex-end;justify-content:center}
+.modal .card{max-width:680px;width:100%;max-height:88vh;overflow:auto;margin:0;border-radius:18px 18px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.modal ol{padding-left:20px;margin:6px 0}.modal li{margin:6px 0}
+.legrow{display:flex;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--bd);font-size:14px}
+.legrow .s{font:18px Georgia,serif;min-width:70px;padding-bottom:6px}
+.row{display:flex;justify-content:space-between;font-size:14px;margin:8px 0 2px}
+canvas#cf{position:fixed;inset:0;pointer-events:none;z-index:20}
+.toast{position:fixed;left:50%;top:16px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:8px 14px;border-radius:99px;font-size:14px;z-index:30;transition:opacity .3s}
+</style></head><body>
+<canvas id="cf"></canvas>
+<main>
+<!-- START -->
+<section id="home">
+  <h1>🏛️ Latein-Arena</h1>
+  <div class="sub">Lektion 12 & 13 · 13 T, Z. 1–6 · KA am Mi, 24.11.26</div>
+  <div class="card rank"><div class="ico" id="rIco">🪖</div><div style="flex:1"><b id="rName"></b><div class="sub" id="rXp"></div><div class="bar"><i id="rBar"></i></div></div></div>
+  <div class="tiles">
+    <button class="tile star" data-go="text"><span class="badge">KA-Text</span><div class="e">🎯</div><b>Satzglied-Jagd: der KA-Text</b><span>Die 5 Sätze aus 13 T, Z. 1–6 – Wort für Wort antippen und zuordnen</span></button>
+    <button class="tile" data-go="new"><div class="e">🗡️</div><b>Satzglied-Jagd: neue Sätze</b><span>6 unbekannte Sätze mit den Vokabeln aus L 12/13</span></button>
+    <button class="tile" data-go="blitz"><div class="e">⚡</div><b>Blitz-Bestimmung</b><span>Ein Wort ist markiert – welches Satzglied ist es?</span></button>
+    <button class="tile" data-go="mix"><div class="e">📜</div><b>Wissens-Mix</b><span>Formen, Vokabeln, Fachbegriffe, Realien</span></button>
+    <button class="tile" data-go="miss"><span class="badge hide" id="missN"></span><div class="e">🔁</div><b>Fehler-Kiste</b><span id="missTx">Was du falsch hattest, kommt hier wieder</span></button>
+  </div>
+  <div class="card hide" id="mixSel"><b>Themen für den Wissens-Mix</b><div class="chips" id="chips"></div><div class="sub" id="cnt"></div><button class="big" id="mixGo">Los geht's!</button></div>
+  <button class="big ghost" id="cheatBtn">🧭 Spickzettel: So findest du die Satzglieder</button>
+</section>
 
-/* Header */
-.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.brand{background:none;border:0;padding:0;text-align:left}
-.brand b{display:block;font-family:var(--font-d);font-weight:800;font-size:1.55rem;letter-spacing:.08em;color:var(--accent);line-height:1.1}
-.brand span{font-size:.82rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:700}
-.purse{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 6px;font-weight:800;font-variant-numeric:tabular-nums}
-.coin{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--gold-bright),var(--gold));display:grid;place-items:center;font-family:var(--font-d);font-size:.72rem;color:#fff8e6;font-weight:800}
-.purse small{font-weight:600;color:var(--muted)}
-.mosaic{height:10px;margin:14px 0 22px;border-radius:2px;background:conic-gradient(var(--accent) 0 25%,var(--surface) 0 50%,var(--gold-bright) 0 75%,var(--surface) 0) 0 0/10px 10px;opacity:.85}
+<!-- SPIEL -->
+<section id="play" class="hide">
+  <div class="top"><button class="home" id="quit" aria-label="Zum Menü">✕</button><span id="prog"></span><span class="streak" id="streak"></span><span id="xpNow"></span></div>
+  <div class="bar"><i id="pbar" style="width:0"></i></div>
+  <div class="card" id="stage"></div>
+</section>
 
-h1,h2,h3{text-wrap:balance;margin:0}
-.lead{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:baseline;margin-bottom:18px}
-.lead h1{font-family:var(--font-d);font-size:1.5rem;font-weight:800}
-.count{font-weight:800;color:var(--gold)}
-.note{color:var(--muted);font-size:.92rem;max-width:62ch;margin:0}
+<!-- ENDE -->
+<section id="end" class="hide">
+  <div class="card" style="text-align:center"><div style="font-size:54px" id="endIco">🏆</div><b style="font-size:22px" id="res"></b><div class="sub" id="resSub"></div></div>
+  <div class="card" id="bycat"></div>
+  <button class="big" id="again">Nochmal!</button>
+  <button class="big ghost" id="toHome">Zum Menü</button>
+</section>
+</main>
 
-/* Station grid */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
-.st{display:flex;flex-direction:column;gap:4px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px;transition:transform .15s,border-color .15s}
-.st:hover{transform:translateY(-2px);border-color:var(--accent)}
-.st .lat{font-family:var(--font-d);font-weight:800;font-size:1.25rem;color:var(--accent);letter-spacing:.04em}
-.st .de{font-weight:800;font-size:1.05rem}
-.st .sub{color:var(--muted);font-size:.88rem;flex:1}
-.st .rec{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:.82rem;color:var(--muted);font-weight:700}
-.stars{color:var(--gold-bright);letter-spacing:2px;font-size:1rem}
-.stars i{font-style:normal;color:var(--line)}
-.st.big{grid-column:1/-1;background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.st.big .lat,.st.big .sub,.st.big .rec{color:var(--accent-ink)}
-.st.big .sub{opacity:.85}
-.tools{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 18px;font-weight:800}
-.btn:hover{border-color:var(--accent);color:var(--accent)}
-.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.btn.pri:hover{color:var(--accent-ink);filter:brightness(1.08)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.foot{margin-top:28px;font-size:.85rem;color:var(--muted);max-width:66ch}
-
-/* Quiz */
-.qbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-.qbar .where{font-family:var(--font-d);font-weight:800;color:var(--accent);font-size:1.1rem;flex:1;min-width:0}
-.chip{border-radius:999px;padding:4px 12px;font-weight:800;font-size:.85rem;background:var(--surface-2);font-variant-numeric:tabular-nums}
-.chip.hot{background:var(--gold-soft);color:var(--gold)}
-.prog{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-bottom:16px}
-.prog i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px}
-.cat{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:8px}
-.prompt{font-size:1.18rem;font-weight:600;margin-bottom:18px;min-width:0;overflow-wrap:anywhere}
-.big{display:block;font-size:2.1rem;font-weight:800;color:var(--accent);margin-top:10px;line-height:1.2}
-.hint{display:block;font-size:.92rem;color:var(--muted);font-weight:600;margin-top:4px}
-.sent{display:block;font-size:1.45rem;font-weight:700;margin-top:12px;line-height:1.7}
-mark{background:var(--gold-soft);color:var(--ink);border-bottom:3px solid var(--gold-bright);padding:1px 6px;border-radius:5px}
-.lat-t{font-weight:800}
-.opts{display:grid;gap:10px}
-@media (min-width:600px){.opts.two{grid-template-columns:1fr 1fr}}
-.opt{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface-2);border:2px solid transparent;border-radius:12px;padding:13px 14px;font-weight:700;font-size:1.04rem;min-width:0;overflow-wrap:anywhere;transition:border-color .12s,transform .12s}
-.opt:hover:not(:disabled){border-color:var(--accent)}
-.opt:disabled{cursor:default}
-.opt kbd{flex:none;font-family:var(--font-b);font-size:.78rem;font-weight:800;width:24px;height:24px;border-radius:6px;display:grid;place-items:center;background:var(--surface);color:var(--muted)}
-.opt.right{background:var(--ok-soft);border-color:var(--ok)}
-.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
-.opt.dim{opacity:.5}
-.opt.lat{font-size:1.15rem}
-.seg{margin-bottom:14px}
-.seg h3{font-size:.8rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.seg h3 b{color:var(--accent)}
-.segrow{display:flex;flex-wrap:wrap;gap:8px}
-.sb{border:2px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 14px;font-weight:800}
-.sb:hover:not(:disabled){border-color:var(--accent)}
-.sb.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.sb:disabled{cursor:default}
-.fb{margin-top:16px;border-radius:14px;padding:16px 18px;animation:pop .25s ease-out}
-.fb.ok{background:var(--ok-soft)}
-.fb.no{background:var(--bad-soft)}
-.fb h3{font-family:var(--font-d);font-size:1.3rem;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
-.fb.ok h3{color:var(--ok)}
-.fb.no h3{color:var(--bad)}
-.fb h3 small{font-family:var(--font-b);font-size:.9rem;font-weight:800;color:var(--gold)}
-.fb p{margin:8px 0 0}
-.tr{color:var(--muted);font-style:italic}
-.next{margin-top:14px;display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
-.keys{font-size:.8rem;color:var(--muted);margin-top:14px;text-align:center}
-@keyframes pop{from{transform:scale(.97);opacity:.4}to{transform:none;opacity:1}}
-
-/* Result */
-.res{text-align:center;padding:30px 22px}
-.res .rank{font-family:var(--font-d);font-weight:800;font-size:2.6rem;color:var(--accent);letter-spacing:.05em}
-.res .rde{color:var(--muted);font-weight:700}
-.res .stars{font-size:2.4rem;letter-spacing:8px;margin:10px 0}
-.nums{display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin:14px 0 6px}
-.nums div{font-weight:700;color:var(--muted);font-size:.85rem}
-.nums b{display:block;font-size:1.6rem;color:var(--ink);font-variant-numeric:tabular-nums}
-.res .tools{justify-content:center}
-.miss{margin-top:22px;display:grid;gap:10px}
-.miss h2{font-family:var(--font-d);font-size:1.15rem;margin-top:8px}
-.mi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.95rem;min-width:0;overflow-wrap:anywhere}
-.mi .big{display:inline;font-size:1.1rem;margin:0 4px}
-.mi .hint,.mi .sent{display:inline;font-size:inherit;margin:0 0 0 4px}
-.mi .sent{font-size:1rem}
-.mi .your{color:var(--bad);font-weight:700}
-
-/* Tafel */
-.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
-.tbox{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
-.tbox h3{font-family:var(--font-d);font-size:1rem;color:var(--accent);margin-bottom:8px}
-.scroll{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:.92rem;font-variant-numeric:tabular-nums}
-th,td{text-align:left;padding:4px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
-th{color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.06em}
-td b{color:var(--accent)}
-.sec{margin:26px 0 12px;font-family:var(--font-d);font-size:1.25rem}
-.rq{display:grid;gap:8px}
-.rq div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px}
-.rq b{color:var(--accent)}
-
-/* Own vocab */
-textarea{width:100%;min-height:220px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:12px;font:inherit;font-size:1rem}
-label.chk{display:flex;gap:10px;align-items:center;font-weight:700;margin-top:12px}
-.ok-msg{color:var(--ok);font-weight:800}
-
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
-
-<div class="wrap" id="app"></div>
+<div class="pal hide" id="pal"><div class="in"><div class="hint" id="palHint"></div><div class="pbtns" id="pbtns"></div></div></div>
+<div class="modal hide" id="cheat"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:18px">🧭 Satzglied-Fahrplan</b><button class="chip" id="cheatX">Schließen</button></div><ol id="stratList"></ol><b>Legende (wie im Unterricht markiert)</b><div id="legend"></div></div></div>
 
 <script>
-/* ---------- helpers ---------- */
-const rnd=n=>Math.floor(Math.random()*n);
-const pick=a=>a[rnd(a.length)];
-const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a};
-const uniq=a=>[...new Set(a)];
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const store={get(k,d){try{const v=localStorage.getItem('la6b:'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-             set(k,v){try{localStorage.setItem('la6b:'+k,JSON.stringify(v))}catch(e){}}};
-function prefer(pool,fn,n=3){return shuffle(pool.filter(fn)).concat(shuffle(pool.filter(x=>!fn(x)))).slice(0,n)}
-function mc(cat,key,prompt,correct,wrongs,explain,extra={}){
-  const opts=shuffle([correct,...uniq(wrongs).filter(w=>w!==correct).slice(0,3)]);
-  return {type:'mc',cat,key,prompt,opts,ans:opts.indexOf(correct),explain,...extra};
-}
-function weighted(arr){const tot=arr.reduce((s,x)=>s+x[1],0);let r=Math.random()*tot;for(const [f,w] of arr){if((r-=w)<0)return f()}return arr[0][0]()}
+const LAB={"S": {"name": "Subjekt", "short": "S", "q": "Wer oder was?", "how": "Nominativ"}, "P": {"name": "Prädikat", "short": "P", "q": "Was tut/tat …?", "how": "Verb mit Personalendung"}, "AO": {"name": "Akkusativ-Objekt", "short": "Akk.-O.", "q": "Wen oder was?", "how": "Akkusativ"}, "AB": {"name": "Adverbialbestimmung", "short": "AB", "q": "Wo? Wann? Wie? Womit? Warum?", "how": "Präposition + Nomen, Ablativ, Adverb"}, "GA": {"name": "Genitiv-Attribut", "short": "Gen.-Attr.", "q": "Wessen?", "how": "Genitiv, hängt an einem Nomen"}, "INF": {"name": "Infinitiv", "short": "Inf.", "q": "Was wollen/hören sie? (-re)", "how": "Grundform auf -re"}, "K": {"name": "Bindewort (kein Satzglied)", "short": "Bindewort", "q": "et, quod, ubi …", "how": "einkreisen"}};
+const ORDER=["S","P","AO","AB","GA","INF","K"];
+const SENT=[{"id": "T1", "title": "13 T, Z. 1–2", "parts": [["Post mortem", "AB", "Wann? – nach dem Tod"], ["Lucretiae", "GA", "Wessen Tod? – Lukretias (Gen.)"], ["Brutus", "S", "Wer suchte Rom auf? – Brutus (Nom.)"], ["cum multis viris", "AB", "Mit wem? – mit vielen Männern (cum + Abl.; multis gehört dazu)"], ["Romam", "AO", "Wen oder was suchte er auf? – Rom (Akk.)"], ["petivit", "P", "Was tat er? – er suchte auf (3. Sg. Perf.)"], ["et", "K", "Bindewort „und“ – verbindet zwei Prädikate"], ["forum", "AO", "Wen oder was besetzte er? – das Forum (Akk.)"], ["occupavit", "P", "Was tat er außerdem? – er besetzte"]], "de": "Nach Lukretias Tod suchte Brutus mit vielen Männern Rom auf und besetzte das Forum."}, {"id": "T2", "title": "13 T, Z. 2–3", "parts": [["Romani", "S", "Wer hörte? – die Römer (Nom. Pl., passt zu -erunt)"], ["Brutum et comites", "AO", "Wen hörten sie? – Brutus und die Gefährten (Akk.)"], ["forum", "AO", "Was besetzten sie? – das Forum (Akk.)"], ["occupare", "INF", "Infinitiv: besetzen → „dass sie das Forum besetzten“"], ["audiverunt", "P", "Was taten die Römer? – sie hörten (3. Pl. Perf.)"]], "de": "Die Römer hörten, dass Brutus und seine Gefährten das Forum besetzten."}, {"id": "T3", "title": "13 T, Z. 3", "parts": [["Voces et arma et multitudo", "S", "Wer oder was erschreckte? – Stimmen, Waffen und die Menge (alle Nom.)"], ["virorum", "GA", "Wessen Menge? – an Männern (Gen. Pl.)"], ["Romanos", "AO", "Wen erschreckten sie? – die Römer (Akk. Pl. -os)"], ["terruerunt", "P", "Was taten sie? – sie erschreckten (3. Pl. Perf.)"]], "de": "Stimmen, Waffen und die Menge an Männern erschreckten die Römer."}, {"id": "T4", "title": "13 T, Z. 4–5", "parts": [["Homines", "S", "Wer eilte? – die Menschen (Nom. Pl.)"], ["statim", "AB", "Wann? – sofort (Adverb)"], ["ad forum", "AB", "Wohin? – zum Forum (ad + Akk.)"], ["properaverunt,", "P", "Was taten sie? – sie eilten"], ["quod", "K", "Bindewort „weil“ – hier beginnt ein neuer Teilsatz"], ["causam", "AO", "Was wollten sie erfahren? – den Grund (Akk.)"], ["clamoris", "GA", "Wessen Grund? – des Geschreis (Gen.)"], ["cognoscere", "INF", "Was wollten sie? – erfahren (Infinitiv auf -re)"], ["voluerunt", "P", "Was taten sie? – sie wollten (Subjekt „sie“ steckt im Prädikat)"]], "de": "Die Menschen eilten sofort zum Forum, weil sie den Grund des Geschreis erfahren wollten."}, {"id": "T5", "title": "13 T, Z. 5–6", "parts": [["Ubi", "K", "Bindewort „sobald“ – beginnt einen Teilsatz"], ["de scelere", "AB", "Wovon hörten sie? – von dem Verbrechen (de + Abl.)"], ["filii", "GA", "Wessen Verbrechen? – des Sohnes (Gen.)"], ["regis", "GA", "Wessen Sohn? – des Königs (Gen.)"], ["et", "K", "Bindewort „und“ – verbindet zwei AB"], ["de sorte misera", "AB", "Wovon? – von dem unglücklichen Schicksal (misera gehört dazu)"], ["Lucretiae", "GA", "Wessen Schicksal? – Lukretias"], ["audiverunt,", "P", "Was taten sie? – sie hörten (Subjekt steckt im Prädikat)"], ["iram", "AO", "Was hielten sie nicht zurück? – den Zorn (Akk.)"], ["non iam", "AB", "Wie? – nicht mehr"], ["tenuerunt", "P", "Was taten sie? – sie hielten (zurück)"]], "de": "Sobald sie von dem Verbrechen des Königssohns und von dem unglücklichen Schicksal Lukretias gehört hatten, hielten sie ihren Zorn nicht mehr zurück."}, {"id": "N1", "title": "Satz 1", "parts": [["Brutus", "S", "Wer? – Brutus"], ["forum", "AO", "Wen oder was? – das Forum"], ["occupavit", "P", "Was tat er? – er besetzte"]], "de": "Brutus besetzte das Forum."}, {"id": "N2", "title": "Satz 2", "parts": [["Romani", "S", "Wer? – die Römer"], ["ad forum", "AB", "Wohin? – zum Forum"], ["properant", "P", "Was tun sie? – sie eilen (Präsens)"]], "de": "Die Römer eilen zum Forum."}, {"id": "N3", "title": "Satz 3", "parts": [["Homines", "S", "Wer? – die Menschen"], ["voces", "AO", "Wen oder was hörten sie? – Stimmen (hier Akk. Pl.!)"], ["audiverunt", "P", "Was taten sie? – sie hörten"]], "de": "Die Menschen hörten Stimmen."}, {"id": "N4", "title": "Satz 4", "parts": [["Filius", "S", "Wer? – der Sohn (Nom.)"], ["regis", "GA", "Wessen Sohn? – des Königs"], ["Lucretiam", "AO", "Wen? – Lukretia (Akk. -am)"], ["terruit", "P", "Was tat er? – er erschreckte"]], "de": "Der Sohn des Königs erschreckte Lukretia."}, {"id": "N5", "title": "Satz 5", "parts": [["Statim", "AB", "Wann? – sofort"], ["ad forum", "AB", "Wohin? – zum Forum"], ["properaverunt", "P", "Was taten sie? – sie eilten. Kein Nominativ da → Subjekt „sie“ steckt im Prädikat!"]], "de": "Sofort eilten sie zum Forum."}, {"id": "N6", "title": "Satz 6", "parts": [["Brutus", "S", "Wer? – Brutus"], ["cum comitibus", "AB", "Mit wem? – mit den Gefährten"], ["Romam", "AO", "Wen oder was? – Rom"], ["petivit", "P", "Was tat er? – er suchte auf"]], "de": "Brutus suchte mit den Gefährten Rom auf."}, {"id": "N7", "title": "Satz 7", "parts": [["Multitudo", "S", "Wer? – die Menge (Nom.)"], ["virorum", "GA", "Wessen Menge? – an Männern"], ["gladiis", "AB", "Womit? – mit Schwertern (Abl. ohne Präposition!)"], ["forum", "AO", "Wen oder was? – das Forum"], ["occupavit", "P", "Was tat sie? – sie besetzte"]], "de": "Die Menge an Männern besetzte mit Schwertern das Forum."}, {"id": "N8", "title": "Satz 8", "parts": [["Romani", "S", "Wer? – die Römer"], ["iram", "AO", "Wen oder was fürchteten sie? – den Zorn"], ["regis", "GA", "Wessen Zorn? – des Königs"], ["timuerunt", "P", "Was taten sie? – sie fürchteten"]], "de": "Die Römer fürchteten den Zorn des Königs."}, {"id": "N9", "title": "Satz 9", "parts": [["Brutus", "S", "Wer? – Brutus"], ["magna voce", "AB", "Wie? – mit lauter Stimme (Abl.)"], ["Romanos", "AO", "Wen? – die Römer (Akk. Pl.)"], ["vocat", "P", "Was tut er? – er ruft"]], "de": "Brutus ruft die Römer mit lauter Stimme."}, {"id": "N10", "title": "Satz 10", "parts": [["Post mortem", "AB", "Wann? – nach dem Tod"], ["Lucretiae", "GA", "Wessen Tod? – Lukretias"], ["Romani", "S", "Wer? – die Römer"], ["Tarquinium", "AO", "Wen wollten sie vertreiben? – Tarquinius"], ["expellere", "INF", "Was wollten sie? – vertreiben (Infinitiv)"], ["voluerunt", "P", "Was taten sie? – sie wollten"]], "de": "Nach Lukretias Tod wollten die Römer Tarquinius vertreiben."}, {"id": "N11", "title": "Satz 11", "parts": [["Rex superbus", "S", "Wer? – der überhebliche König (superbus gehört zu rex!)"], ["Romanos", "AO", "Wen? – die Römer"], ["terruit", "P", "Was tat er? – er erschreckte"]], "de": "Der überhebliche König erschreckte die Römer."}, {"id": "N12", "title": "Satz 12", "parts": [["Quod", "K", "Bindewort „weil“"], ["Romani", "S", "Wer? – die Römer"], ["scelus", "AO", "Wen oder was erfuhren sie? – das Verbrechen (Neutrum: Akk. = Nom.)"], ["filii", "GA", "Wessen Verbrechen? – des Sohnes"], ["cognoverunt,", "P", "Was taten sie? – sie erfuhren"], ["iram", "AO", "Wen oder was? – den Zorn"], ["non iam", "AB", "Wie? – nicht mehr"], ["tenuerunt", "P", "Was taten sie? – sie hielten (zurück)"]], "de": "Weil die Römer das Verbrechen des Sohnes erfahren hatten, hielten sie den Zorn nicht mehr zurück."}, {"id": "N13", "title": "Satz 13", "parts": [["Ubi", "K", "Bindewort „sobald“"], ["homines", "S", "Wer? – die Menschen"], ["clamorem", "AO", "Wen oder was? – das Geschrei (Akk.)"], ["audiverunt,", "P", "Was taten sie? – sie hörten"], ["ad forum", "AB", "Wohin? – zum Forum"], ["properaverunt", "P", "Was taten sie dann? – sie eilten"]], "de": "Sobald die Menschen das Geschrei gehört hatten, eilten sie zum Forum."}, {"id": "N14", "title": "Satz 14", "parts": [["Comites", "S", "Wer? – die Gefährten (Nom. Pl.)"], ["Bruti", "GA", "Wessen Gefährten? – des Brutus"], ["arma", "AO", "Wen oder was halten sie? – Waffen (Neutrum Pl.: -a)"], ["tenent", "P", "Was tun sie? – sie halten"]], "de": "Die Gefährten des Brutus halten Waffen."}, {"id": "N15", "title": "Satz 15", "parts": [["Tandem", "AB", "Wann? – endlich"], ["Brutus", "S", "Wer? – Brutus"], ["gentem", "AO", "Wen? – die Familie (Akk.)"], ["Tarquiniorum", "GA", "Wessen Familie? – der Tarquinier (Gen. Pl.)"], ["expellit", "P", "Was tut er? – er vertreibt"]], "de": "Endlich vertreibt Brutus die Familie der Tarquinier."}, {"id": "N16", "title": "Satz 16", "parts": [["Romani et Collatinus", "S", "Wer? – die Römer und Collatinus"], ["Tarquinium", "AO", "Wen? – Tarquinius"], ["cum filio", "AB", "Mit wem? – mit seinem Sohn"], ["expellunt", "P", "Was tun sie? – sie vertreiben"]], "de": "Die Römer und Collatinus vertreiben Tarquinius mit seinem Sohn."}];
+const STRAT=[["Bindewörter einkreisen", "<b>et, quod, ubi</b> sind <i>keine</i> Satzglieder. Sie trennen den Satz in Teilsätze – jeder Teilsatz hat sein <b>eigenes</b> Prädikat."], ["Prädikat zuerst!", "Suche das Verb mit Personalendung (<b>-t, -nt, -it, -erunt …</b>) und unterstreiche es doppelt. Die Endung verrät die Person: <b>-nt / -erunt</b> → „sie“ (Plural)."], ["Subjekt fragen: Wer oder was?", "Suche einen <b>Nominativ</b>, der zur Endung des Prädikats passt (Plural zu Plural). Findest du keinen, <b>steckt das Subjekt im Prädikat</b> (properaverunt = <i>sie</i> eilten)."], ["Objekt fragen: Wen oder was?", "Akkusativ-Endungen: <b>-am, -um, -em, -as, -os, -es</b>; bei Neutra auch <b>-a</b> (arma) – Achtung: Neutrum Akk. = Nom. (forum, scelus)."], ["Umstände fragen: Wo? Wann? Wie? Womit?", "Präposition + Nomen gehören <b>zusammen</b> (cum multis viris = eine AB). Auch Adverbien (statim, tandem, non iam) und Ablative ohne Präposition (gladiis, magna voce) sind AB."], ["Genitiv anhängen: Wessen?", "Genitive (<b>-ae, -i, -orum, -is</b>) sind <b>kein eigenes Satzglied</b> – sie hängen an einem Nomen (causam <u>clamoris</u>)."], ["Schluss-Check", "Jedes Wort markiert? Adjektiv beim Nomen (KNG)? Jeder Teilsatz hat genau ein Prädikat?"]];
+const Q=[["Satzglied-Strategie", "Womit fängst du bei der Satzglied-Bestimmung an (nach dem Einkreisen der Bindewörter)?", ["Mit dem Prädikat", "Mit dem ersten Wort", "Mit dem Subjekt", "Mit dem Genitiv"], "Das Prädikat (Verb mit Personalendung) ist der Kern. Seine Endung verrät dir, ob das Subjekt Singular oder Plural ist."], ["Satzglied-Strategie", "Welche Satzglieder muss jeder (Teil-)Satz unbedingt haben?", ["Prädikat und Subjekt (das Subjekt kann im Prädikat stecken)", "Subjekt und Akkusativ-Objekt", "Prädikat und Adverbialbestimmung", "Nur ein Subjekt"], "Ohne Prädikat kein Satz. Das Subjekt ist immer da – notfalls in der Personalendung versteckt (properaverunt = sie eilten)."], ["Satzglied-Strategie", "„Statim ad forum properaverunt.“ Wo ist das Subjekt?", ["Es steckt im Prädikat: „sie“", "statim", "ad forum", "Der Satz hat kein Subjekt"], "Kein Nominativ im Satz → das Subjekt steckt in der Endung -erunt (= sie)."], ["Satzglied-Strategie", "Das Prädikat endet auf -erunt. Was weißt du über das Subjekt?", ["Es steht im Plural (3. Person: sie)", "Es steht im Singular", "Es steht im Akkusativ", "Es ist ein Genitiv"], "Subjekt und Prädikat passen im Numerus zusammen: -nt/-erunt → Plural."], ["Satzglied-Strategie", "Welche Wörter sind KEINE Satzglieder?", ["et, quod, ubi (Bindewörter)", "statim, tandem", "Romani, Brutus", "petivit, occupavit"], "Bindewörter verbinden nur. Eure Lehrkraft kreist sie ein."], ["Satzglied-Strategie", "„cum multis viris“ – wie viele Satzglieder sind das?", ["Eins: zusammen eine AB", "Drei: AB, Attribut, Objekt", "Zwei: AB und Subjekt", "Gar keins"], "Präposition + Nomen (+ Adjektiv) gehören immer zusammen: Mit wem? – mit vielen Männern."], ["Satzglied-Strategie", "Ein Genitiv-Attribut …", ["hängt an einem Nomen und ist kein eigenes Satzglied", "ist immer das Subjekt", "ist immer eine AB", "steht immer am Satzanfang"], "Frage: Wessen? causam clamoris = der Grund des Geschreis. clamoris gehört zu causam."], ["Satzglied-Strategie", "Mit welchen Fragen findest du eine Adverbialbestimmung?", ["Wo? Wann? Wie? Womit? Warum?", "Wer oder was?", "Wen oder was?", "Wessen?"], "AB = Umstände. Typisch: Präposition + Nomen, Adverbien (statim) oder Ablative (gladiis)."], ["Satzglied-Strategie", "„Multitudo gladiis forum occupavit.“ Was ist gladiis?", ["AB (Womit? – mit Schwertern)", "Akkusativ-Objekt", "Subjekt", "Genitiv-Attribut"], "gladiis = Ablativ Plural. Ein Ablativ ohne Präposition ist meistens eine AB."], ["Satzglied-Strategie", "„forum“ kann Nominativ oder Akkusativ sein. Wie entscheidest du?", ["Am Satz: Gibt es schon ein Subjekt? Passt es zum Prädikat?", "Gar nicht – beides ist immer richtig", "forum ist immer Subjekt", "forum ist immer Genitiv"], "Bei Neutra ist Nom. = Akk. In „Brutus forum occupavit“ ist Brutus das Subjekt, also ist forum Akk.-Objekt."], ["Satzglied-Strategie", "Was gehört bei „rex superbus“ zusammen?", ["Beide Wörter: Adjektiv + Nomen = ein Satzglied", "Nur rex ist ein Satzglied, superbus ein eigenes", "superbus ist das Prädikat", "Gar nichts"], "Das Adjektiv richtet sich nach seinem Nomen (KNG) und gehört zum selben Satzglied."], ["Satzglied-Strategie", "Romani – Romanos – Romanorum: Was passt?", ["Subjekt – Akk.-Objekt – Gen.-Attribut", "Akk.-Objekt – Subjekt – AB", "Gen.-Attr. – Subjekt – Akk.-Objekt", "Alle drei sind Subjekte"], "-i = Nom. Pl., -os = Akk. Pl., -orum = Gen. Pl."], ["Deklination", "forum occupavit: Was ist „forum“?", ["Akk. Sg. N. (Akk.-Objekt)", "Nom. Sg. M. (Subjekt)", "Abl. Sg. N. (AB)", "Akk. Pl. N."], "forum, fori (o-Dekl.), Neutrum: Akk. Sg. = Nom. Sg. Hier Objekt von occupavit."], ["Deklination", "Romani (Z. 2): Kasus, Numerus, Genus?", ["Nom. Pl. M.", "Gen. Sg. M.", "Akk. Pl. M.", "Nom. Sg. F."], "Romanus (o-Dekl.). Nom. Pl. = Subjekt: „die Römer“."], ["Deklination", "scelere (Z. 5) heißt …", ["mit dem Verbrechen (Abl. Sg. N.)", "des Verbrechens (Gen. Sg.)", "die Verbrechen (Nom. Pl.)", "dem Verbrechen (Dat. Sg.)"], "scelus, sceleris (3. Dekl., N.). Abl. Sg. = -e, hier als AB (de scelere: „von dem Verbrechen“)."], ["Deklination", "post mortem: Nominativ und Deklination?", ["mors, mortis (3. Dekl.)", "mors, mortis (a-Dekl.)", "mortus, morti (o-Dekl.)", "morta, mortae (a-Dekl.)"], "mors ist Femininum der 3. Deklination. Hier Akk. Sg. nach der Präposition post."], ["Deklination", "clamoris (Z. 4) ist …", ["Gen. Sg. M. (Genitiv-Attribut)", "Nom. Pl. M. (Subjekt)", "Akk. Sg. M. (Objekt)", "Abl. Sg. M. (AB)"], "clamor, clamoris (3. Dekl.). causam clamoris = der Grund des Geschreis."], ["Deklination", "voces (Z. 3) ist …", ["Nom. Pl. F.", "Akk. Sg. F.", "Gen. Sg. F.", "Nom. Sg. F."], "vox, vocis (3. Dekl., F.). Subjekt zu terruerunt: die Stimmen."], ["Deklination", "arma (Z. 3) ist …", ["Nom. Pl. N. (Subjekt)", "Nom. Sg. F.", "Akk. Sg. M.", "Abl. Sg. F."], "arma, armorum (o-Dekl., N. Pl.): „die Waffen“. Neutra haben im Plural -a bei Nom. und Akk."], ["Deklination", "virorum (Z. 3) ist …", ["Gen. Pl. M.", "Gen. Sg. M.", "Akk. Pl. M.", "Nom. Pl. M."], "vir, viri (o-Dekl.): multitudo virorum = die Menge an Männern (Genitiv-Attribut)."], ["Deklination", "Romanos (Z. 3) ist …", ["Akk. Pl. M. (Akk.-Objekt)", "Nom. Pl. M. (Subjekt)", "Gen. Sg. M.", "Akk. Sg. M."], "Romanus (o-Dekl.). Endung -os = Akk. Pl. M.: „die Römer“ als Objekt von terruerunt."], ["Deklination", "homines (Z. 4): Nominativ und Deklination?", ["homo, hominis (3. Dekl.)", "homus, homi (o-Dekl.)", "homa, homae (a-Dekl.)", "homes, homitis (3. Dekl.)"], "homo, hominis: 3. Deklination. Nom. Pl. = homines (Subjekt)."], ["Deklination", "Welches Genus hat „multitudo“?", ["Femininum", "Maskulinum", "Neutrum", "Genus nicht bestimmbar"], "multitudo, multitudinis (3. Dekl.) ist Femininum: die Menge."], ["Deklination", "Nominativ Singular von „regis“ (Z. 5)?", ["rex", "regus", "regis", "regs"], "rex, regis (3. Dekl.). regis = Gen. Sg. (filii regis = des Königssohnes)."], ["Konjugation", "audiverunt heißt …", ["3. Pl. Ind. Perfekt", "3. Pl. Ind. Präsens", "3. Sg. Ind. Perfekt", "1. Pl. Ind. Perfekt"], "audire (i-Konj.): Perfektstamm audiv- + -erunt = sie haben gehört / sie hörten."], ["Konjugation", "Welche Endungen hat das Indikativ Perfekt Aktiv?", ["-i, -isti, -it, -imus, -istis, -erunt", "-o, -s, -t, -mus, -tis, -nt", "-, -te", "-or, -ris, -tur, -mur, -mini, -ntur"], "Die Perfektendungen sind in allen Konjugationen gleich."], ["Konjugation", "Präsens 3. Pl. von audire?", ["audiunt", "audient", "audiverunt", "audiant"], "Präsensendungen: -o, -s, -t, -mus, -tis, -nt. Bei der i-Konjugation: audio, audis, audit, audimus, auditis, audiunt."], ["Konjugation", "Imperativ Plural von tenere?", ["tenete", "tene", "tenent", "tenuerunt"], "Imperativ Sg. = Stamm (tene!), Pl. = Stamm + -te (tenete!)."], ["Konjugation", "Perfekt 1. Sg. von occupare?", ["occupavi", "occupo", "occupavit", "occupaverunt"], "occupa-v-i: Perfektstamm + -i = ich habe besetzt."], ["Konjugation", "terruerunt (Z. 3): Form und Infinitiv?", ["3. Pl. Perfekt von terrere", "3. Pl. Präsens von terrere", "3. Sg. Perfekt von terrere", "3. Pl. Perfekt von terrare"], "terrere (e-Konj.), Perfekt terru-: sie haben erschreckt."], ["Konjugation", "Imperativ Singular von properare?", ["propera!", "properate!", "properat", "properavi"], "a-Konjugation: propera! (Sg.), properate! (Pl.) = Eile! / Eilt!"], ["Konjugation", "petivit (Z. 1) heißt …", ["er suchte auf / hat aufgesucht", "sie suchten auf", "er sucht auf", "suche auf!"], "petere, Perfekt petiv-: petivit = 3. Sg. Perfekt."], ["Konjugation", "Präsens 2. Sg. von occupare?", ["occupas", "occupat", "occupo", "occupatis"], "occupo, occupas, occupat, occupamus, occupatis, occupant."], ["Vokabeln", "properare", ["eilen", "besetzen", "hören", "halten"], "properare, propero, properavi."], ["Vokabeln", "causa, causae f.", ["Grund, Ursache", "Zorn", "Stimme", "Schicksal"], "causam clamoris cognoscere = den Grund des Geschreis erfahren."], ["Vokabeln", "ira, irae f.", ["Zorn", "Eile", "Mord", "Ehre"], "iram non iam tenuerunt = sie hielten ihren Zorn nicht mehr zurück."], ["Vokabeln", "cognoscere", ["erkennen, erfahren", "erschrecken", "aufsuchen", "wollen"], "cognosco, cognovi."], ["Vokabeln", "non iam", ["nicht mehr", "noch nicht", "immer", "nie"], "non iam = nicht mehr."], ["Vokabeln", "ubi (im Satz Z. 5)", ["sobald", "wo", "weil", "obwohl"], "Ubi … audiverunt: sobald sie gehört hatten."], ["Vokabeln", "quod (Z. 4)", ["weil", "was", "dass", "aber"], "quod causam clamoris cognoscere voluerunt = weil sie den Grund erfahren wollten."], ["Vokabeln", "sors, sortis f.", ["Schicksal, Los", "Gefährte", "Menge", "Waffe"], "de sorte misera Lucretiae: von dem unglücklichen Schicksal der Lukretia."], ["Realienkunde", "Wer war Tarquinius Superbus?", ["der siebte und letzte König Roms", "der erste Konsul", "der Mann der Lukretia", "ein Freund des Brutus"], "Er war wegen seiner grausamen Herrschaft verhasst."], ["Realienkunde", "Wer war Lukretia?", ["Frau des Collatinus", "Tochter des Brutus", "Schwester des Sextus", "Frau des Königs"], "Sie wurde von Sextus, dem Sohn des Königs, überfallen und nahm sich anschließend das Leben."], ["Realienkunde", "Wer war Sextus Tarquinius?", ["Sohn des Königs", "Sohn des Brutus", "Gefährte des Brutus", "Mann der Lukretia"], "Sein Verbrechen erregte den Zorn der Römer."], ["Realienkunde", "Was tat L. Iunius Brutus nach Lukretias Tod?", ["Er besetzte mit vielen Männern das Forum", "Er floh aus Rom", "Er verteidigte den König", "Er heiratete Lukretia"], "Das Geschrei und die Waffen erschreckten die Römer, die dann zum Forum eilten."], ["Übersetzung", "Voces Romanos terruerunt.", ["Die Stimmen erschreckten die Römer.", "Die Römer erschreckten die Stimmen.", "Die Römer hörten Stimmen.", "Die Stimme erschreckt die Römer."], "voces = Nom. Pl. (Subjekt), Romanos = Akk. Pl. (Objekt)."], ["Übersetzung", "Brutus cum multis viris Romam petivit.", ["Brutus suchte mit vielen Männern Rom auf.", "Brutus suchte viele Männer in Rom auf.", "Viele Männer suchten Brutus in Rom auf.", "Brutus eilte mit vielen Männern nach Rom."], "cum multis viris = AB; Romam = Akk.-Objekt."], ["Übersetzung", "Homines ad forum properaverunt.", ["Die Menschen eilten zum Forum.", "Die Menschen suchten das Forum auf.", "Der Mensch eilt zum Forum.", "Die Menschen besetzten das Forum."], "properaverunt = 3. Pl. Perfekt; ad forum = AB."], ["Übersetzung", "Ubi de scelere audiverunt, iram non iam tenuerunt.", ["Sobald sie vom Verbrechen gehört hatten, hielten sie den Zorn nicht mehr zurück.", "Weil sie das Verbrechen hörten, hielten sie den Zorn zurück.", "Sie hörten das Verbrechen und hielten den Zorn noch zurück.", "Wo sie das Verbrechen sahen, zürnten sie nicht mehr."], "ubi = sobald, non iam = nicht mehr, tenuerunt = sie hielten zurück."], ["Grammatik", "Infinitiv Perfekt von vocare?", ["vocavisse", "vocare", "vocavi", "vocaverunt"], "Perfektstamm + -isse: voca-v-isse = gerufen (zu) haben."], ["Grammatik", "Infinitiv Perfekt von esse?", ["fuisse", "esse", "fui", "fuerunt"], "fu-isse = gewesen (zu) sein."], ["Grammatik", "Der Infinitiv Perfekt im AcI drückt aus …", ["Vorzeitigkeit", "Gleichzeitigkeit", "Nachzeitigkeit", "einen Befehl"], "Infinitiv der Vorzeitigkeit: Das Geschehen im AcI liegt vor dem des Prädikats."], ["Grammatik", "Der Infinitiv Präsens im AcI drückt aus …", ["Gleichzeitigkeit", "Vorzeitigkeit", "Nachzeitigkeit", "einen Wunsch"], "Infinitiv der Gleichzeitigkeit."], ["Grammatik", "Claudia amicum laboravisse scit.", ["Claudia weiß, dass der Freund gearbeitet hat.", "Claudia weiß, dass der Freund arbeitet.", "Claudia sieht den Freund arbeiten.", "Claudia weiß, dass der Freund arbeiten wird."], "laboravisse = Infinitiv Perfekt, also Vorzeitigkeit."], ["Grammatik", "AcI steht für …", ["Accusativus cum Infinitivo", "Ablativus cum Imperativo", "Accusativus et Imperfectum", "Actio cum Infinitivo"], "Der AcI ist eine satzwertige Konstruktion; meist Übersetzung mit einem dass-Satz."], ["Grammatik", "Constat Tarquinium regem superbum esse.", ["Es steht fest, dass Tarquinius ein überheblicher König ist.", "Tarquinius steht fest als König.", "Es steht fest, dass Tarquinius König war.", "Tarquinius weiß, dass der König überheblich ist."], "constat + AcI; esse = Infinitiv der Gleichzeitigkeit."], ["Grammatik", "Wonach richtet sich ein Adjektiv (KNG-Kongruenz)?", ["Kasus, Numerus, Genus des Bezugsworts", "Person, Numerus, Tempus", "Kasus, Modus, Genus", "Tempus, Modus, Genus"], "Endungen sind gleich, wenn beide zur selben Deklinationsklasse gehören (magna templa), sonst verschieden (magnos montes)."], ["Grammatik", "Akk. Pl. m. von magnus?", ["magnos", "magnas", "magna", "magnis"], "o-Deklination: -os im Akk. Pl. M. (magnos montes)."], ["Grammatik", "Nom. Pl. f. von magnus?", ["magnae", "magni", "magna", "magnas"], "a-Deklination: -ae im Nom. Pl. F."], ["Grammatik", "Nom. Sg. f. von miser, misera, miserum?", ["misera", "miser", "miserum", "miseria"], "Adjektiv auf -er, a, um: wie Substantive auf -er."], ["Grammatik", "Tarquinius rex superbus est.", ["Beides möglich: rex oder superbus kann Prädikatsnomen sein", "Nur rex kann Prädikatsnomen sein", "Nur superbus kann Prädikatsnomen sein", "Der Satz ist falsch"], "Tarquinius ist ein überheblicher König – oder: Der König Tarquinius ist überheblich. Im Satzmodell unterscheidbar."], ["Grammatik", "Das Präfix con- bedeutet …", ["zusammen", "weg", "zurück", "nicht"], "convenire = zusammenkommen; constat von con + stare."], ["Grammatik", "munitio kommt von …", ["munire (Handlung/Ergebnis)", "mors (Zustand)", "munus (Person)", "mutare (Mittel)"], "Suffix -io: Handlung oder Ergebnis. munire = bauen, befestigen."], ["Vokabeln 12", "debere", ["müssen, sollen; schulden", "Gefahr", "schweigen", "befehlen"], "debere = müssen, sollen; schulden."], ["Vokabeln 12", "accedere", ["herbeikommen, hinzukommen", "weggehen", "zurückkehren", "vertrauen"], "accedere = herbeikommen, hinzukommen."], ["Vokabeln 12", "periculum", ["Gefahr", "Brücke", "Schwert", "Vertrauen"], "periculum = Gefahr."], ["Vokabeln 12", "tacere", ["schweigen", "hören", "vertrauen", "beginnen"], "tacere = schweigen."], ["Vokabeln 12", "tandem", ["endlich", "plötzlich", "zuerst", "näher"], "tandem = endlich."], ["Vokabeln 12", "iubere", ["anordnen, befehlen", "verbieten", "schweigen", "müssen"], "iubere = anordnen, befehlen."], ["Vokabeln 12", "instituere", ["beginnen, einrichten, unterrichten", "vertreiben", "verlassen", "befreien"], "instituere = beginnen, einrichten, unterrichten."], ["Vokabeln 12", "repente", ["plötzlich", "endlich", "zuerst", "schließlich"], "repente = plötzlich."], ["Vokabeln 12", "pons, pontis m", ["Brücke", "Schwert", "Bau", "Gefahr"], "pons, pontis m = Brücke."], ["Vokabeln 12", "primum", ["erstens, zuerst", "schließlich", "näher", "freilich"], "primum = erstens, zuerst."], ["Vokabeln 12", "procul", ["von fern, weit weg", "näher", "bis jetzt", "plötzlich"], "procul = von fern, weit weg."], ["Vokabeln 12", "postremo", ["schließlich", "zuerst", "näher", "endlich"], "postremo = schließlich."], ["Vokabeln 12", "propius", ["näher", "weit weg", "bis jetzt", "sofort"], "propius = näher."], ["Vokabeln 12", "quidem", ["freilich, gewiss, wenigstens, zwar", "nicht einmal", "bis jetzt", "plötzlich"], "quidem = freilich, gewiss, wenigstens, zwar."], ["Vokabeln 12", "mecum", ["mit mir", "mit dir", "mit uns", "ohne mich"], "mecum = mit mir."], ["Vokabeln 12", "munitio", ["Bau, Befestigung", "Vertrauen", "Gefahr", "Schwert"], "munitio = Bau, Befestigung."], ["Vokabeln 12", "adhuc", ["bis jetzt, noch", "endlich", "nicht einmal", "von fern"], "adhuc = bis jetzt, noch."], ["Vokabeln 12", "prospicere", ["schauen auf, sehen, vorhersehen", "betrachten", "warten", "erblicken"], "prospicere = schauen auf, sehen, vorhersehen."], ["Vokabeln 12", "telum", ["(Angriffs-)Waffe, Geschoss", "Schwert", "Bau", "Zorn"], "telum = (Angriffs-)Waffe, Geschoss."], ["Vokabeln 12", "ne … quidem", ["nicht einmal", "wenigstens", "zwar", "noch nicht"], "ne … quidem = nicht einmal."], ["Vokabeln 12", "fiducia", ["Vertrauen", "Gefahr", "Befestigung", "Schicksal"], "fiducia = Vertrauen."], ["Vokabeln 12", "carere (m. Abl.)", ["frei sein von, etw. nicht haben", "vertrauen", "schauen auf", "müssen"], "carere (m. Abl.) = frei sein von, etw. nicht haben."], ["Vokabeln 12", "confidere", ["vertrauen", "schweigen", "befehlen", "fürchten"], "confidere = vertrauen."], ["Vokabeln 12", "gladius", ["Schwert", "Geschoss", "Brücke", "Vertrauen"], "gladius = Schwert."], ["Vokabeln 12", "constat", ["es ist bekannt, es steht fest", "er steht", "es kostet", "es fehlt"], "constat = es ist bekannt, es steht fest."], ["Vokabeln 12", "Horatius Cocles", ["Held der römischen Frühzeit", "letzter König Roms", "Verschwörer gegen Tarquinius", "Etrusker"], "Horatius Cocles = Held der römischen Frühzeit."], ["Vokabeln 12", "Tusci, Tuscorum", ["die Etrusker", "die Römer", "die Gefährten", "die Könige"], "Tusci, Tuscorum = die Etrusker."], ["Vokabeln 13", "colere", ["bewirtschaften, pflegen; verehren", "besetzen", "vertreiben", "bauen"], "colere = bewirtschaften, pflegen; verehren."], ["Vokabeln 13", "maritus", ["Ehemann", "König", "Sohn", "Gefährte"], "maritus = Ehemann."], ["Vokabeln 13", "gens", ["Familienverband, Stamm, Volk", "Mensch", "Menge", "Gefährte"], "gens = Familienverband, Stamm, Volk."], ["Vokabeln 13", "nex", ["Mord, Tod", "Blut", "Schicksal", "Gefahr"], "nex = Mord, Tod."], ["Vokabeln 13", "relinquere", ["verlassen, zurücklassen", "vertreiben", "befreien", "erkennen"], "relinquere = verlassen, zurücklassen."], ["Vokabeln 13", "expellere", ["vertreiben, verbannen", "befreien", "besetzen", "erschrecken"], "expellere = vertreiben, verbannen."], ["Vokabeln 13", "ignorare", ["nicht kennen, nicht wissen", "genau wissen", "erkennen", "hören"], "ignorare = nicht kennen, nicht wissen."], ["Vokabeln 13", "non ignorare", ["genau wissen, gut kennen", "nicht wissen", "nicht hören", "nicht kennen"], "non ignorare = genau wissen, gut kennen."], ["Vokabeln 13", "num (im dir. Fragesatz)", ["etwa?", "nicht?", "warum?", "wer?"], "num (im dir. Fragesatz) = etwa?."], ["Vokabeln 13", "sanguis, sanguinis m", ["Blut, Blutvergießen", "Mord", "Schwert", "Zorn"], "sanguis, sanguinis m = Blut, Blutvergießen."], ["Vokabeln 13", "tutus, a, um", ["sicher (vor)", "ganz", "schlecht", "stolz"], "tutus, a, um = sicher (vor)."], ["Vokabeln 13", "totus, a, um", ["ganz", "sicher", "viel", "groß"], "totus, a, um = ganz."], ["Vokabeln 13", "liberare", ["befreien, freilassen", "vertreiben", "verlassen", "fürchten"], "liberare = befreien, freilassen."], ["Vokabeln 13", "et … et", ["sowohl … als auch", "entweder … oder", "weder … noch", "und doch"], "et … et = sowohl … als auch."], ["Vokabeln 13", "timere", ["Angst haben, fürchten", "erschrecken", "vertrauen", "schweigen"], "timere = Angst haben, fürchten."], ["Vokabeln 13", "ultimus, a, um", ["der äußerste, der letzte", "der erste", "der größte", "der beste"], "ultimus, a, um = der äußerste, der letzte."], ["Vokabeln 13", "propter (m. Akk.)", ["wegen", "vor", "hinter", "trotz"], "propter (m. Akk.) = wegen."], ["Vokabeln 13", "inquit", ["sagt(e) er", "fragt er", "er weiß", "er hört"], "inquit = sagt(e) er."], ["Vokabeln 13", "superbus, a, um", ["stolz, überheblich", "schlecht", "arm", "sicher"], "superbus, a, um = stolz, überheblich."], ["Vokabeln 13", "malus, a, um", ["schlecht, schlimm", "gut", "groß", "viel"], "malus, a, um = schlecht, schlimm."], ["Vokabeln 13", "mors, mortis f", ["Tod", "Mord", "Blut", "Schicksal"], "mors, mortis f = Tod."], ["Vokabeln 13", "magna voce", ["mit lauter Stimme", "mit großer Menge", "mit großem Mut", "mit leiser Stimme"], "magna voce = mit lauter Stimme."], ["Vokabeln 13", "multus, a, um", ["viel", "groß", "gut", "ganz"], "multus, a, um = viel."], ["Vokabeln 13", "bonus, a, um", ["gut", "groß", "schlecht", "sicher"], "bonus, a, um = gut."], ["Fachbegriffe", "Kasus bedeutet …", ["Fall", "Zahl", "Geschlecht", "Zeit"], "Nominativ, Genitiv, Dativ, Akkusativ, Ablativ sind die Kasus."], ["Fachbegriffe", "Numerus bedeutet …", ["Zahl (Singular / Plural)", "Fall", "Geschlecht", "Befehlsform"], "Singular = Einzahl, Plural = Mehrzahl."], ["Fachbegriffe", "Genus bedeutet …", ["grammatisches Geschlecht", "Zahl", "Fall", "Zeitform"], "Maskulinum, Femininum, Neutrum."], ["Fachbegriffe", "Deklination ist …", ["die Beugung der Nomen", "die Beugung der Verben", "die Befehlsform", "die Vergangenheit"], "Nomen (und Adjektive) werden dekliniert – Deklinationenbasilika!"], ["Fachbegriffe", "Konjugation ist …", ["die Beugung der Verben", "die Beugung der Nomen", "ein Satzglied", "ein Fall"], "Verben werden konjugiert: -o, -s, -t, -mus, -tis, -nt."], ["Fachbegriffe", "Indikativ ist …", ["die Wirklichkeitsform („normaler Modus“)", "die Befehlsform", "die Vergangenheit", "die Mehrzahl"], "So steht es auf dem Vorbereitungsblatt: Indikativ = Wirklichkeitsmodus."], ["Fachbegriffe", "Imperativ ist …", ["die Befehlsform", "die Wirklichkeitsform", "die Zeitform der Vergangenheit", "ein Kasus"], "propera! / properate! = Eile! / Eilt!"], ["Fachbegriffe", "Perfekt ist …", ["eine Zeitform der Vergangenheit", "die Gegenwart", "die Befehlsform", "ein Fall"], "petivit = er suchte auf / er hat aufgesucht."], ["Fachbegriffe", "Ein Attribut ist …", ["eine Beifügung, die ein Nomen näher bestimmt", "das Verb des Satzes", "immer das Subjekt", "ein Bindewort"], "z. B. Genitiv-Attribut (filius regis) oder Adjektiv (sors misera)."], ["Realienkunde", "Warum eilten die Menschen zum Forum?", ["Sie wollten den Grund des Geschreis erfahren", "Sie wollten den König feiern", "Es war Markttag", "Brutus hatte sie eingeladen"], "quod causam clamoris cognoscere voluerunt (Z. 4–5)."]];
+const PQ={S:"Wer/was?",P:"Verb",AO:"Wen/was?",AB:"Wo/wann/wie?",GA:"Wessen?",INF:"-re",K:"et/quod/ubi"};
+const RANKS=[[0,"🪖","Tiro – Rekrut"],[80,"🛡️","Miles – Soldat"],[200,"⚔️","Centurio"],[380,"🏇","Tribunus"],[600,"🏛️","Consul"],[900,"👑","Imperator"]];
+const $=id=>document.getElementById(id);
+const sh=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const col=k=>"var(--L-"+k+")";
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const lt=(k,x)=>'<span class="lt'+(x?" x":"")+'" style="--c:'+col(k)+'">'+LAB[k].short+'</span>';
 
-/* ---------- Deklinationen ---------- */
-const KAS=['Nominativ','Genitiv','Dativ','Akkusativ','Ablativ'];
-const KAS_S=['Nom.','Gen.','Dat.','Akk.','Abl.'];
-const NUM=['Singular','Plural'], NUM_S=['Sg.','Pl.'];
-const GEN_L={m:'Maskulinum',f:'Femininum',n:'Neutrum'};
-const TABLES={
-  a: {name:'a-Deklination',            ex:'amica',  end:['a','ae','ae','am','a','ae','arum','is','as','is']},
-  us:{name:'o-Deklination (auf -us)',  ex:'servus', end:['us','i','o','um','o','i','orum','is','os','is']},
-  um:{name:'o-Deklination (Neutrum)',  ex:'donum',  end:['um','i','o','um','o','a','orum','is','a','is']},
-  er:{name:'o-Deklination (auf -er)',  ex:'puer',   end:['','i','o','um','o','i','orum','is','os','is']},
-  k: {name:'3. Deklination (m/f)',     ex:'senator',end:['','is','i','em','e','es','um','ibus','es','ibus']},
-  kn:{name:'3. Deklination (Neutrum)', ex:'corpus', end:['','is','i','','e','a','um','ibus','a','ibus']}
-};
-const NOUNS=[
-  {st:'amic',t:'a',g:'f',de:'Freundin'},{st:'vill',t:'a',g:'f',de:'Landhaus'},{st:'port',t:'a',g:'f',de:'Tor'},
-  {st:'turb',t:'a',g:'f',de:'Menschenmenge'},{st:'fabul',t:'a',g:'f',de:'Geschichte'},
-  {st:'serv',t:'us',g:'m',de:'Sklave'},{st:'domin',t:'us',g:'m',de:'Herr'},{st:'equ',t:'us',g:'m',de:'Pferd'},{st:'fili',t:'us',g:'m',de:'Sohn'},
-  {st:'don',t:'um',g:'n',de:'Geschenk'},{st:'for',t:'um',g:'n',de:'Marktplatz'},{st:'templ',t:'um',g:'n',de:'Tempel'},{st:'pericul',t:'um',g:'n',de:'Gefahr'},
-  {nom:'puer',st:'puer',t:'er',g:'m',de:'Junge'},{nom:'ager',st:'agr',t:'er',g:'m',de:'Acker, Feld'},
-  {nom:'senator',st:'senator',t:'k',g:'m',de:'Senator'},{nom:'mercator',st:'mercator',t:'k',g:'m',de:'Kaufmann'},
-  {nom:'clamor',st:'clamor',t:'k',g:'m',de:'Geschrei'},{nom:'vox',st:'voc',t:'k',g:'f',de:'Stimme'},
-  {nom:'homo',st:'homin',t:'k',g:'m',de:'Mensch'},{nom:'pater',st:'patr',t:'k',g:'m',de:'Vater'},{nom:'mater',st:'matr',t:'k',g:'f',de:'Mutter'},
-  {nom:'corpus',st:'corpor',t:'kn',g:'n',de:'Körper'},{nom:'nomen',st:'nomin',t:'kn',g:'n',de:'Name'},{nom:'tempus',st:'tempor',t:'kn',g:'n',de:'Zeit'},
-  /* aus Lektion 12 und 13 */
-  {st:'caus',t:'a',g:'f',de:'Ursache, Sache'},{st:'gladi',t:'us',g:'m',de:'Schwert'},{st:'marit',t:'us',g:'m',de:'Ehemann'},
-  {st:'tel',t:'um',g:'n',de:'Waffe, Geschoss'},{nom:'rex',st:'reg',t:'k',g:'m',de:'König'},
-  {nom:'munitio',st:'munition',t:'k',g:'f',de:'Bau, Befestigung'},{nom:'scelus',st:'sceler',t:'kn',g:'n',de:'Verbrechen'}
-];
-const forms=n=>TABLES[n.t].end.map(e=>e===''?n.nom:n.st+e);
-const lemma=n=>{const f=forms(n);return `${f[0]}, ${f[1]}`};
-const kn=i=>`${KAS[i%5]} ${NUM[i<5?0:1]}`;
+/* ---------- Speicher ---------- */
+let st={xp:0,missQ:[],missS:[]};
+try{const r=JSON.parse(localStorage.getItem("la2")||"null");if(r)st=Object.assign(st,r)}catch(e){}
+const save=()=>{try{localStorage.setItem("la2",JSON.stringify(st))}catch(e){}};
 
-/* Adjektive der a- und o-Deklination (Lektion 13, S. 48) */
-const ADJ=[{st:'magn',de:'groß'},{st:'bon',de:'gut'},{st:'mal',de:'schlecht'},{st:'superb',de:'stolz, überheblich'},
-  {nom:'miser',st:'miser',de:'arm, unglücklich'},{st:'ultim',de:'der letzte'},{st:'Roman',de:'römisch'},{st:'mult',de:'viel'}];
-const adjForms=a=>({m:forms(a.nom?{nom:a.nom,st:a.st,t:'er'}:{st:a.st,t:'us'}),f:forms({st:a.st,t:'a'}),n:forms({st:a.st,t:'um'})});
-const adjLemma=a=>{const F=adjForms(a);return a.nom?`${F.m[0]}, ${F.f[0]}, ${F.n[0]}`:`${F.m[0]}, -a, -um`};
-const kng=v=>`${KAS[v.c]} ${NUM[v.n]} ${GEN_L[v.g]}`;
-function qKoenig(){
-  let form,valid=[],hint,extra='',key;
-  if(Math.random()<.25){
-    const a=pick(ADJ),F=adjForms(a),g=pick(['m','f','n']);form=F[g][rnd(10)];
-    ['m','f','n'].forEach(gg=>F[gg].forEach((x,j)=>{if(x===form)valid.push({c:j%5,n:j<5?0:1,g:gg})}));
-    hint=`Adjektiv von <i>${adjLemma(a)}</i> · ${a.de}`;key='ka:'+form;
-    extra=' Bei Adjektiven ergibt sich das Genus aus der Endung.';
-  }else{
-    const n=pick(NOUNS),f=forms(n);form=f[rnd(10)];
-    f.forEach((x,j)=>{if(x===form)valid.push({c:j%5,n:j<5?0:1,g:n.g})});
-    hint=`von <i>${lemma(n)}</i> · ${n.de}`;key='k:'+form+n.st;extra=` (${TABLES[n.t].name})`;
-  }
-  const sol=valid.map(kng).join(' oder ');
-  return {type:'koenig',cat:'Formenbestimmung · KöNiG',key,valid,
-    prompt:`Bestimme Kasus, Numerus und Genus:<span class="big">${form}</span><span class="hint">${hint}</span>`,
-    solution:sol,
-    explain:`<b>${form}</b> = ${sol}.${extra}${valid.length>1?' Hier passen mehrere Möglichkeiten – eine davon reicht als Antwort.':''}`};
-}
-function qKNG(){
-  const n=pick(NOUNS),f=forms(n),i=rnd(10),nf=f[i],a=pick(ADJ),F=adjForms(a)[n.g],ok=new Set();
-  f.forEach((x,j)=>{if(x===nf)ok.add(F[j])});
-  const c=F[i],all=adjForms(a),pool=uniq([...all.m,...all.f,...all.n]).filter(x=>!ok.has(x));
-  const diff=!['a','us','um','er'].includes(n.t)||(n.t==='a'&&n.g!=='f');
-  return mc('KNG-Kongruenz','kng:'+nf+a.st,`Welche Form von <span class="lat-t">${adjLemma(a)}</span> (${a.de}) passt zu:<span class="big">${nf}</span><span class="hint">von <i>${lemma(n)}</i> · ${n.de}</span>`,
-    c,shuffle(pool),`<b>${nf} ${c}</b>: Das Adjektiv richtet sich in Kasus, Numerus und Genus nach dem Nomen (${kn(i)}, ${GEN_L[n.g]}).${diff?' Die Endungen sehen hier verschieden aus, weil Nomen und Adjektiv zu verschiedenen Deklinationen gehören – gleich ist nur KNG!':''}`,{lat:true});
-}
-function qBilde(){
-  const n=pick(NOUNS),f=forms(n),i=rnd(10),t=f[i];
-  return mc('Formen bilden','b:'+n.st+i,`Bilde den <b>${kn(i)}</b> von <span class="lat-t">${lemma(n)}</span> (${n.de}).`,
-    t,shuffle(uniq(f.filter(x=>x!==t))),`${kn(i)} von ${f[0]}: <b>${t}</b> · ${TABLES[n.t].name}`,{lat:true});
-}
-function qEndung(){
-  const k=pick(['a','us','um','k','kn']),T=TABLES[k];let i;do{i=rnd(10)}while(T.end[i]==='');
-  const c='-'+T.end[i];const ex=forms(NOUNS.find(n=>n.t===k))[i];
-  return mc('Deklinationenbasilika','e:'+k+i,`Welche Endung hat die <b>${T.name}</b> im <b>${kn(i)}</b>?<span class="hint">Musterwort: ${T.ex}</span>`,
-    c,shuffle(uniq(T.end.filter(x=>x!=='').map(x=>'-'+x))),`${T.name}, ${KAS_S[i%5]} ${NUM_S[i<5?0:1]}: <b>${c}</b> – zum Beispiel <i>${ex}</i>.`,{lat:true});
-}
-function qDekl(){
-  const n=pick(NOUNS),f=forms(n);
-  const D={a:'a-Deklination',us:'o-Deklination',um:'o-Deklination',er:'o-Deklination',k:'3. Deklination',kn:'3. Deklination'};
-  const c=D[n.t];
-  return mc('Deklinationenbasilika','d:'+n.st,`Zu welcher Deklination gehört <span class="lat-t">${f[0]}, ${f[1]}</span>?`,
-    c,uniq(Object.values(D)),`Am Genitiv Singular erkennst du die Deklination: <i>${f[1]}</i> → <b>${c}</b>.`);
-}
+/* ---------- Rang ---------- */
+function rank(){let i=0;RANKS.forEach((r,k)=>{if(st.xp>=r[0])i=k});const r=RANKS[i],n=RANKS[i+1];
+$("rIco").textContent=r[1];$("rName").textContent=r[2];
+$("rXp").textContent=st.xp+" XP"+(n?" · noch "+(n[0]-st.xp)+" XP bis "+n[2]:" · höchster Rang!");
+$("rBar").style.width=(n?(st.xp-r[0])/(n[0]-r[0])*100:100)+"%";
+const m=st.missQ.length+st.missS.length;$("missN").textContent=m;$("missN").classList.toggle("hide",!m);
+$("missTx").textContent=m?m+" Aufgaben warten auf Revanche":"Noch leer – super!";return i}
 
-/* ---------- Verben ---------- */
-const PRON=['ich','du','er/sie/es','wir','ihr','sie'];
-const AUX={h:['habe','hast','hat','haben','habt','haben'],s:['bin','bist','ist','sind','seid','sind']};
-const PRES={a:['o','as','at','amus','atis','ant'],e:['eo','es','et','emus','etis','ent'],i:['io','is','it','imus','itis','iunt'],k:['o','is','it','imus','itis','unt']};
-const IMP={a:['a','ate'],e:['e','ete'],i:['i','ite'],k:['e','ite']};
-const PERF=['i','isti','it','imus','istis','erunt'];
-const VERBS=[
- ['vocare','a','voc','vocav','rufen','rufe rufst ruft rufen ruft rufen','ruf! ruft!','gerufen','h'],
- ['laudare','a','laud','laudav','loben','lobe lobst lobt loben lobt loben','lob! lobt!','gelobt','h'],
- ['clamare','a','clam','clamav','schreien, rufen','schreie schreist schreit schreien schreit schreien','schrei! schreit!','geschrien','h'],
- ['spectare','a','spect','spectav','betrachten','betrachte betrachtest betrachtet betrachten betrachtet betrachten','betrachte! betrachtet!','betrachtet','h'],
- ['dare','a','d','ded','geben','gebe gibst gibt geben gebt geben','gib! gebt!','gegeben','h'],
- ['monere','e','mon','monu','ermahnen','ermahne ermahnst ermahnt ermahnen ermahnt ermahnen','ermahne! ermahnt!','ermahnt','h'],
- ['videre','e','vid','vid','sehen','sehe siehst sieht sehen seht sehen','sieh! seht!','gesehen','h'],
- ['manere','e','man','mans','bleiben','bleibe bleibst bleibt bleiben bleibt bleiben','bleib! bleibt!','geblieben','s'],
- ['ridere','e','rid','ris','lachen','lache lachst lacht lachen lacht lachen','lach! lacht!','gelacht','h'],
- ['respondere','e','respond','respond','antworten','antworte antwortest antwortet antworten antwortet antworten','antworte! antwortet!','geantwortet','h'],
- ['audire','i','aud','audiv','hören','höre hörst hört hören hört hören','hör! hört!','gehört','h'],
- ['venire','i','ven','ven','kommen','komme kommst kommt kommen kommt kommen','komm! kommt!','gekommen','s'],
- ['mittere','k','mitt','mis','schicken','schicke schickst schickt schicken schickt schicken','schick! schickt!','geschickt','h'],
- ['currere','k','curr','cucurr','laufen','laufe läufst läuft laufen lauft laufen','lauf! lauft!','gelaufen','s'],
- ['scribere','k','scrib','scrips','schreiben','schreibe schreibst schreibt schreiben schreibt schreiben','schreib! schreibt!','geschrieben','h'],
- ['legere','k','leg','leg','lesen','lese liest liest lesen lest lesen','lies! lest!','gelesen','h'],
- ['esse','x','','fu','sein','bin bist ist sind seid sind','sei! seid!','gewesen','s'],
- ['tacere','e','tac','tacu','schweigen','schweige schweigst schweigt schweigen schweigt schweigen','schweig! schweigt!','geschwiegen','h',12],
- ['iubere','e','iub','iuss','anordnen, befehlen','befehle befiehlst befiehlt befehlen befehlt befehlen','befiehl! befehlt!','befohlen','h',12],
- ['terrere','e','terr','terru','erschrecken','erschrecke erschreckst erschreckt erschrecken erschreckt erschrecken','erschreck! erschreckt!','erschreckt','h',13],
- ['timere','e','tim','timu','Angst haben, fürchten','fürchte fürchtest fürchtet fürchten fürchtet fürchten','fürchte! fürchtet!','gefürchtet','h',13],
- ['occupare','a','occup','occupav','besetzen, einnehmen','besetze besetzt besetzt besetzen besetzt besetzen','besetz! besetzt!','besetzt','h',13],
- ['liberare','a','liber','liberav','befreien, freilassen','befreie befreist befreit befreien befreit befreien','befrei! befreit!','befreit','h',13],
- ['expellere','k','expell','expul','vertreiben, verbannen','vertreibe vertreibst vertreibt vertreiben vertreibt vertreiben','vertreib! vertreibt!','vertrieben','h',13],
- ['relinquere','k','relinqu','reliqu','verlassen, zurücklassen','verlasse verlässt verlässt verlassen verlasst verlassen','verlass! verlasst!','verlassen','h',13],
- ['cognoscere','k','cognosc','cognov','erkennen, kennenlernen','erkenne erkennst erkennt erkennen erkennt erkennen','erkenne! erkennt!','erkannt','h',13]
-].map(([inf,k,st,pf,mean,dp,di,part,aux,lek])=>({inf,k,st,pf,mean,dp:dp.split(' '),di:di.split(' '),part,aux,lek,
-   pres:k==='x'?['sum','es','est','sumus','estis','sunt']:null, imp:k==='x'?['es','este']:null}));
-const pl=p=>`${p%3+1}. Pers. ${p<3?'Sg.':'Pl.'}`;
-function vforms(v){
-  const r=[];
-  (v.pres||PRES[v.k].map(e=>v.st+e)).forEach((f,p)=>r.push({f,t:'pres',p,de:`${PRON[p]} ${v.dp[p]}`,lab:`${pl(p)} Präsens`}));
-  (v.imp||IMP[v.k].map(e=>v.st+e)).forEach((f,p)=>r.push({f,t:'imp',p,de:v.di[p],lab:`Imperativ ${p?'Plural':'Singular'}`}));
-  PERF.forEach((e,p)=>r.push({f:v.pf+e,t:'perf',p,de:`${PRON[p]} ${AUX[v.aux][p]} ${v.part}`,lab:`${pl(p)} Perfekt`}));
-  return r;
-}
-const vinfo=v=>{const f=vforms(v);return `${v.inf}, ${f[0].f}, ${f[8].f}`};
-function near(a){return x=>x.t===a.t||x.p===a.p}
-function qVerbDe(){
-  const v=pick(VERBS),all=vforms(v),a=pick(all),same=all.filter(x=>x.f===a.f),ok=new Set(same.map(x=>x.de));
-  const pool=[...new Map(all.filter(x=>!ok.has(x.de)).map(x=>[x.de,x])).values()];
-  return mc('Verben übersetzen','vd:'+a.f,`Übersetze:<span class="big">${a.f}</span><span class="hint">von ${vinfo(v)} · ${v.mean}</span>`,
-    a.de,prefer(pool,near(a)).map(x=>x.de),`<b>${a.f}</b> = ${same.map(x=>`${x.lab} → „${x.de}“`).join(' <i>oder</i> ')}`);
-}
-function qVerbBest(){
-  const v=pick(VERBS),all=vforms(v),a=pick(all),same=all.filter(x=>x.f===a.f),ok=new Set(same.map(x=>x.lab));
-  const pool=[...new Map(all.filter(x=>!ok.has(x.lab)).map(x=>[x.lab,x])).values()];
-  return mc('Verbformen bestimmen','vb:'+a.f,`Bestimme die Form:<span class="big">${a.f}</span><span class="hint">von ${vinfo(v)} · ${v.mean}</span>`,
-    a.lab,prefer(pool,near(a)).map(x=>x.lab),`<b>${a.f}</b> = ${same.map(x=>`${x.lab} („${x.de}“)`).join(' <i>oder</i> ')}`);
-}
-function qVerbLat(){
-  const v=pick(VERBS),all=vforms(v),a=pick(all);
-  const pool=[...new Map(all.filter(x=>x.f!==a.f&&x.de!==a.de).map(x=>[x.f,x])).values()];
-  return mc('Ins Lateinische','vl:'+a.f,`Wie heißt auf Latein:<span class="big">${a.de}</span><span class="hint">Verb: ${vinfo(v)} · ${v.mean}</span>`,
-    a.f,prefer(pool,near(a)).map(x=>x.f),`„${a.de}“ = <b>${a.f}</b> (${a.lab})`,{lat:true});
-}
-const VEND={pres:['-o / -m','-s','-t','-mus','-tis','-nt'],perf:['-i','-isti','-it','-imus','-istis','-erunt']};
-function qVerbEnd(){
-  if(Math.random()<.2){const p=rnd(2);const c=p?'-te':'nur der Stamm (ohne Endung)';
-    return mc('Personalendungen','vi:'+p,`Woran erkennst du den <b>Imperativ ${p?'Plural':'Singular'}</b>?`,c,
-      ['-te','nur der Stamm (ohne Endung)','-tis','-mus','-nt'],`Imperativ Singular: reiner Stamm (voca!, audi!) · Imperativ Plural: Stamm + <b>-te</b> (vocate!, audite!).`);}
-  const t=pick(['pres','perf']),p=rnd(6),c=VEND[t][p],T=t==='pres'?'Präsens':'Perfekt';
-  return mc('Personalendungen','ve:'+t+p,`Welche Personalendung steht im <b>${T}</b> für <b>„${PRON[p]}“</b> (${pl(p)})?`,
-    c,shuffle(VEND[t]),`${T}: ${VEND[t].map((x,i)=>i===p?`<b>${x}</b>`:x).join(' · ')}`,{lat:true});
-}
+/* ---------- Spickzettel ---------- */
+$("stratList").innerHTML=STRAT.map(s=>"<li><b>"+s[0]+"</b> – "+s[1]+"</li>").join("");
+$("legend").innerHTML=ORDER.map(k=>'<div class="legrow"><span class="s m-'+k+'" style="--c:'+col(k)+'">verbum</span><div><b style="color:'+col(k)+'">'+LAB[k].name+'</b> · '+LAB[k].q+'<br><span class="sub">'+LAB[k].how+'</span></div></div>').join("");
+$("cheatBtn").onclick=()=>$("cheat").classList.remove("hide");
+$("cheatX").onclick=()=>$("cheat").classList.add("hide");
+$("cheat").onclick=e=>{if(e.target.id==="cheat")$("cheat").classList.add("hide")};
 
-/* ---------- Satzglieder ---------- */
-const ROLES={S:'Subjekt',P:'Prädikat',O:'Objekt',D:'Objekt',A:'Adverbiale',T:'Attribut',N:'Prädikatsnomen'};
-const RQ={S:'Wer oder was …?',P:'Was tut jemand? Was geschieht?',O:'Wen oder was? (Akkusativobjekt)',D:'Wem? (Dativobjekt)',
-          A:'Wo? Wann? Wie? Womit? (nähere Umstände)',T:'Was für ein …? Welcher? Wessen? (bestimmt ein Nomen näher)',
-          N:'Was ist jemand? Wie ist jemand? (ergänzt „esse“, z. B. „ist groß“)'};
-const ROLE_OPTS=['Subjekt','Prädikat','Objekt','Adverbiale','Attribut','Prädikatsnomen'];
-const SENT=[
- /* Beispiele aus Lektion 13 (S. 48–49) */
- ['Forum|S magnum|N est|P','Der Marktplatz ist groß.'],
- ['Servus_et_serva|S miseri|N sunt|P','Der Sklave und die Sklavin sind arm.'],
- ['Liberi|S magnos|T montes|O vident|P','Die Kinder sehen große Berge.'],
- ['In_foro|A magna|T templa|S sunt|P','Auf dem Forum sind große Tempel.'],
- ['Homo|S bonus|T amicis|D adest|P','Ein guter Mensch hilft seinen Freunden.'],
- ['Tarquinius|S superbus|N est|P','Tarquinius ist überheblich.'],
- ['Rex|S superbus|T Romanos|O terret|P','Der überhebliche König erschreckt die Römer.'],
- ['Tandem|A Romani|S regem|O malum|T expellunt|P','Endlich vertreiben die Römer den schlechten König.'],
- ['Servus|S dominum|O vocat|P','Der Sklave ruft den Herrn.'],
- ['Marcus|S in_foro|A amicum|O exspectat|P','Marcus erwartet auf dem Forum seinen Freund.'],
- ['Puellae|S amicae|D donum|O dant|P','Die Mädchen geben der Freundin ein Geschenk.'],
- ['Senatores|S in_curia|A diu|A disputant|P','Die Senatoren diskutieren lange in der Kurie.'],
- ['Hodie|A multi|T homines|S in_circum|A properant|P','Heute eilen viele Menschen in den Circus.'],
- ['Mercator|S servo|D pecuniam|O dat|P','Der Kaufmann gibt dem Sklaven Geld.'],
- ['Cornelia|S cum_amica|A per_vias|A ambulat|P','Cornelia geht mit ihrer Freundin durch die Straßen spazieren.'],
- ['Servi|S in_villa|A cenam|O bonam|T parant|P','Die Sklaven bereiten im Landhaus ein gutes Essen vor.'],
- ['Gladiatores|S in_arena|A pugnant|P','Die Gladiatoren kämpfen in der Arena.'],
- ['Populus|S Romanus|T gladiatores|O spectat|P','Das römische Volk betrachtet die Gladiatoren.'],
- ['Tum|A Gaius|S filium|O Marci|T salutat|P','Dann grüßt Gaius den Sohn des Marcus.'],
- ['Pater|S liberis|D fabulam|O narrat|P','Der Vater erzählt den Kindern eine Geschichte.'],
- ['Heri|A senator|S in_forum|A venit|P','Gestern ist der Senator auf das Forum gekommen.'],
- ['Turba|S clamorem|O magnum|T audivit|P','Die Menge hat ein lautes Geschrei gehört.'],
- ['Statim|A respondemus|P','Wir antworten sofort.'],
- ['Amici|S in_thermis|A rident|P','Die Freunde lachen in den Thermen.'],
- ['Domina|S servae|D donum|O pulchrum|T dedit|P','Die Herrin hat der Sklavin ein schönes Geschenk gegeben.'],
- ['Mercatores|S magna_voce|A clamant|P','Die Kaufleute rufen mit lauter Stimme.'],
- ['Subito|A puer|S equum|O videt|P','Plötzlich sieht der Junge ein Pferd.']
-];
-const parseS=s=>s.split(' ').map(w=>{const [t,r]=w.split('|');return {t:t.replace(/_/g,' '),r}});
-function qSatzRole(){
-  const s=pick(SENT),parts=parseS(s[0]),i=rnd(parts.length),x=parts[i],c=ROLES[x.r];
-  let ex=`Frage: <i>${RQ[x.r]}</i> → <b>${x.t}</b> ist ein ${c}.`;
-  if(x.r==='P'&&!parts.some(p=>p.r==='S'))ex+=' Das Subjekt steckt hier in der Personalendung.';
-  if(x.r==='T')ex+=' Das Attribut ist kein eigenes Satzglied, sondern gehört zu einem Nomen.';
-  ex+=`<br><span class="tr">„${s[1]}“</span>`;
-  return {type:'mc',cat:'Satzglieder · Handlungsmodell',key:'sr:'+s[0]+i,
-    prompt:`Welches Satzglied ist markiert?<span class="sent">${parts.map((p,j)=>j===i?`<mark>${p.t}</mark>`:p.t).join(' ')}.</span>`,
-    opts:ROLE_OPTS.slice(),ans:ROLE_OPTS.indexOf(c),explain:ex};
-}
-function qSatzFind(){
-  for(let k=0;k<30;k++){
-    const s=pick(SENT),parts=parseS(s[0]),r=pick(['S','P','O','A']);
-    const hits=parts.filter(p=>ROLES[p.r]===ROLES[r]);if(hits.length!==1)continue;
-    const x=hits[0],others=parts.filter(p=>p!==x).map(p=>p.t);if(others.length<2)continue;
-    return mc('Satzglieder · Handlungsmodell','sf:'+s[0]+r,`Was ist in diesem Satz das <b>${ROLES[r]}</b>?<span class="sent">${parts.map(p=>p.t).join(' ')}.</span>`,
-      x.t,shuffle(others),`Frage: <i>${RQ[x.r]}</i> → <b>${x.t}</b><br><span class="tr">„${s[1]}“</span>`,{lat:true});
-  }
-  return qSatzRole();
-}
+/* ---------- Konfetti & Toast ---------- */
+function confetti(){const c=$("cf"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+const cs=["#c99a2e","#8c2f39","#2563eb","#16a34a","#ea580c","#c026d3"];
+let p=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight/3,vx:(Math.random()-.5)*14,vy:Math.random()*-12-3,r:Math.random()*6+3,c:cs[Math.random()*6|0],a:Math.random()*6}));
+let t=0;(function f(){x.clearRect(0,0,c.width,c.height);p.forEach(q=>{q.x+=q.vx;q.y+=q.vy;q.vy+=.35;q.a+=.2;x.fillStyle=q.c;x.save();x.translate(q.x,q.y);x.rotate(q.a);x.fillRect(-q.r/2,-q.r/2,q.r,q.r*1.6);x.restore()});if(++t<110)requestAnimationFrame(f);else x.clearRect(0,0,c.width,c.height)})()}
+function toast(m){const d=document.createElement("div");d.className="toast";d.textContent=m;document.body.append(d);setTimeout(()=>d.style.opacity=0,1400);setTimeout(()=>d.remove(),1800)}
 
-/* ---------- Vokabeln ---------- */
-const VOC=[
- ...`amica, -ae f=Freundin;amicus, -i m=Freund;servus, -i m=Sklave, Diener;serva, -ae f=Sklavin, Dienerin;dominus, -i m=Herr;domina, -ae f=Herrin;villa, -ae f=Landhaus, Landgut;via, -ae f=Weg, Straße;porta, -ae f=Tor;aqua, -ae f=Wasser;turba, -ae f=(Menschen-)Menge;pecunia, -ae f=Geld;cena, -ae f=Essen, Mahlzeit;fabula, -ae f=Geschichte, Erzählung;puella, -ae f=Mädchen;filia, -ae f=Tochter;curia, -ae f=Kurie, Rathaus;filius, -i m=Sohn;equus, -i m=Pferd;populus, -i m=Volk;puer, pueri m=Junge;ager, agri m=Acker, Feld;liberi, -orum m=Kinder;forum, -i n=Forum, Marktplatz;templum, -i n=Tempel;donum, -i n=Geschenk;gaudium, -i n=Freude;senator, -oris m=Senator;mercator, -oris m=Kaufmann, Händler;clamor, -oris m=Geschrei, Lärm;homo, hominis m=Mensch;pater, patris m=Vater;mater, matris f=Mutter;corpus, corporis n=Körper;nomen, nominis n=Name;tempus, temporis n=Zeit`.split(/;(?! )/).map(x=>[...x.split('='),'n']),
- ...VERBS.map(v=>[vinfo(v),v.mean,'v',v.lek]),
- ...`exspectare=warten, erwarten;properare=eilen;ambulare=spazieren gehen;salutare=grüßen;narrare=erzählen;pugnare=kämpfen;gaudere=sich freuen;sedere=sitzen`.split(/;(?! )/).map(x=>[...x.split('='),'v']),
- ...`hodie=heute;heri=gestern;diu=lange;tum=da, dann, damals;statim=sofort;iam=schon, bereits;nunc=nun, jetzt;semper=immer;non=nicht;subito=plötzlich;ibi=dort;etiam=auch, sogar`.split(/;(?! )/).map(x=>[...x.split('='),'adv']),
- ...`et=und;sed=aber, sondern;quod=weil;cur?=warum?;ubi?=wo?;quis?=wer?;quid?=was?;neque=und nicht, auch nicht`.split(/;(?! )/).map(x=>[...x.split('='),'konj']),
- ...`in + Abl.=in, an, auf (wo?);in + Akk.=in, nach (wohin?);cum + Abl.=mit;ad + Akk.=zu, bei, an;per + Akk.=durch;ex / e + Abl.=aus, von … her;de + Abl.=von, über;a / ab + Abl.=von`.split(/;(?! )/).map(x=>[...x.split('='),'prep']),
- ...`pulcher, -chra, -chrum=schön;laetus, -a, -um=froh, fröhlich`.split(/;(?! )/).map(x=>[...x.split('='),'adj']),
- /* Lektion 12 (Buch S. 44) – Format: Latein=Deutsch=Wortart */
- ...`pons, pontis m=Brücke=n;primum=erstens, zuerst, zum ersten Mal=adv;procul=von fern, weit weg=adv;postremo=schließlich=adv;propius=näher=adv;quidem=freilich, gewiss, wenigstens, zwar=adv;mecum=mit mir=adv;munitio, munitionis f=Bau, Befestigung=n;adhuc=bis jetzt, noch=adv;prospicere, prospicio=schauen auf, sehen, vorhersehen=v;telum, -i n=(Angriffs-)Waffe, Geschoss=n;ne … quidem=nicht einmal=adv;fiducia, -ae f=Vertrauen=n;carere, careo, carui + Abl.=frei sein von, etw. nicht haben=v;confidere, confido=vertrauen=v;gladius, -i m=Schwert=n;constat=es ist bekannt, es steht fest=v;Tusci, Tuscorum m Pl.=die Etrusker=n;debere=müssen, sollen; schulden=v;accedere=herbeikommen, hinzukommen=v;periculum, -i n=Gefahr=n;tandem=endlich=adv;instituere=beginnen, einrichten, unterrichten=v;repente=plötzlich=adv`.split(/;(?! )/).map(x=>{const [l,d,p]=x.split('=');return [l,d,p,12]}),
- /* Lektion 13 (Buch S. 47) */
- ...`magnus, -a, -um=groß, bedeutend=adj;multus, -a, -um=viel=adj;multi, -ae=viele=adj;multa n Pl.=viel(es)=adj;bonus, -a, -um=gut=adj;mors, mortis f=Tod=n;causa, -ae f=Ursache, Sache, Prozess=n;scelus, sceleris n=Verbrechen; Schurke=n;rex, regis m=König=n;sors, sortis f=Los, Orakelspruch, Schicksal=n;miser, misera, miserum=arm, erbärmlich, unglücklich=adj;magna voce=mit lauter Stimme=adv;inquit=sagt(e) er=v;propter + Akk.=wegen=prep;superbus, -a, -um=stolz, überheblich=adj;malus, -a, -um=schlecht, schlimm=adj;ignorare, ignoro=nicht kennen, nicht wissen=v;non ignorare=genau wissen, gut kennen=v;num?=etwa?=konj;sanguis, sanguinis m=Blut, Blutvergießen=n;si=falls, wenn=konj;tutus, -a, -um (a + Abl.)=sicher (vor)=adj;totus, -a, -um=ganz=adj;et … et=sowohl … als auch=konj;ita=so=adv;ultimus, -a, -um=der äußerste, der entfernteste, der letzte=adj;post=hinter, nach; dann, später=prep;vox, vocis f=Äußerung, Laut, Stimme=n;arma, armorum n Pl.=Waffen, Gerät=n;maritus, -i m=Ehemann=n;colere=bewirtschaften, pflegen; verehren=v;gens, gentis f=Familienverband, Stamm, Volk=n;nex, necis f=Mord, Tod=n;Romanus, -a, -um=römisch; (als Nomen) Römer=adj`.split(/;(?! )/).map(x=>{const [l,d,p]=x.split('=');return [l,d,p,13]})
-];
-/* Wortbildung (Lektion 12, S. 45–46) */
-const PRAEF=[['ab- (a-, abs-)','weg-, ab-'],['ad- (ac-, at- …)','hinzu-, dabei-'],['circum-','um-, herum-'],['com- (col-, con-)','zusammen-'],['de-','herab-, weg-'],['ex- (e-, ef-)','heraus-'],['in-','hinein-, darin-'],['per-','(hin)durch-'],['pro-','vor-, voraus-'],['ne-','nicht'],['re-','zurück-, wieder']];
-const SUFF=[['-io','oratio (von orare)','Handlung oder Ergebnis'],['-ium','aedificium (von aedificare)','Handlung oder Ergebnis'],['-mentum','ornamentum (von ornare)','Mittel oder Ergebnis'],['-or','dolor (von dolere)','Zustand oder Eigenschaft'],['-tas','libertas (von liber)','Zustand oder Eigenschaft'],['-tudo','magnitudo (von magnus)','Zustand oder Eigenschaft'],['-tor','imperator (von imperare)','handelnde Person']];
-const KOMP=[['convenire','besuchen, zusammenkommen','venire + com-'],['pervenire','kommen zu / nach','venire + per-'],['circumvenire','umringen, umzingeln','venire + circum-'],['aspicere','erblicken','specere + ad-'],['prospicere','schauen auf, vorhersehen','specere + pro-'],['exspectare','warten, erwarten','spectare + ex-'],['inducere','(hin)einführen, verleiten','ducere + in-'],['constat','es ist bekannt, es steht fest','stare + com-']];
-function qWort(){
-  const r=rnd(3);
-  if(r===0){const i=rnd(PRAEF.length),x=PRAEF[i];
-    return mc('Wortbildung · Präfixe','wp:'+i,`Was bedeutet die Vorsilbe (Präfix) <span class="big">${x[0]}</span>`,x[1],shuffle(PRAEF.map(p=>p[1])),`<b>${x[0]}</b> = ${x[1]}`);}
-  if(r===1){const i=rnd(SUFF.length),x=SUFF[i];
-    return mc('Wortbildung · Suffixe','ws:'+i,`Was bezeichnet ein Nomen mit der Nachsilbe <span class="big">${x[0]}</span><span class="hint">Beispiel: ${x[1]}</span>`,x[2],uniq(SUFF.map(s=>s[2])),`<b>${x[0]}</b> → ${x[2]}, z. B. ${x[1]}`);}
-  const i=rnd(KOMP.length),x=KOMP[i];
-  return mc('Wortbildung · Komposita','wk:'+i,`Was bedeutet <span class="big">${x[0]}</span><span class="hint">gebildet aus ${x[2]}</span>`,x[1],shuffle(KOMP.map(k=>k[1])),`<b>${x[0]}</b> (${x[2]}) = ${x[1]}`);
-}
-function ownVoc(){return store.get('own',[])}
-function vocPool(){const own=ownVoc();return (store.get('ownOnly',false)&&own.length>=4)?own:VOC.concat(own)}
-const meanings=s=>s.toLowerCase().split(/[,;]\s*/).map(x=>x.replace(/\(.*?\)/g,'').trim()).filter(Boolean);
-function qVoc(){
-  const pool=vocPool(),lek=pool.filter(x=>x[3]);
-  const w=(lek.length&&Math.random()<.7)?pick(lek):pick(pool),dir=rnd(2),wm=meanings(w[1]);
-  const rest=pool.filter(x=>x[0]!==w[0]&&!meanings(x[1]).some(m=>wm.includes(m)));
-  const wr=prefer(rest,x=>x[2]===w[2],6).map(x=>esc(dir?x[0]:x[1]));
-  const cat=w[3]?`Vokabeln · Lektion ${w[3]}`:w[2]==='own'?'Vokabeln · eigene':'Vokabeln · Grundwortschatz';
-  if(dir===0)return mc(cat,'v:'+w[0],`Was bedeutet:<span class="big">${esc(w[0])}</span>`,esc(w[1]),wr,`<b>${esc(w[0])}</b> = ${esc(w[1])}`);
-  return mc(cat,'v:'+w[0],`Wie heißt auf Latein:<span class="big">${esc(w[1])}</span>`,esc(w[0]),wr,`${esc(w[1])} = <b>${esc(w[0])}</b>`,{lat:true});
-}
+/* ---------- Runde ---------- */
+let deck=[],idx=0,pts=0,maxPts=0,streak=0,bestStreak=0,gained=0,stat={},lastMode=null;
+function startRound(mode){lastMode=mode;let d=[];
+ if(mode==="text")d=SENT.filter(s=>s.id[0]==="T").map(s=>({t:"hunt",s}));
+ if(mode==="new")d=sh(SENT.filter(s=>s.id[0]==="N")).slice(0,6).map(s=>({t:"hunt",s}));
+ if(mode==="blitz")d=Array.from({length:10},()=>({t:"blitz",...mkBlitz()}));
+ if(mode==="mix")d=sh(Q.filter(q=>sel.has(q[0]))).slice(0,12).map(q=>({t:"mc",q}));
+ if(mode==="miss"){d=sh(st.missS.map(id=>({t:"hunt",s:SENT.find(s=>s.id===id)})).filter(x=>x.s).concat(st.missQ.map(k=>({t:"mc",q:Q.find(q=>q[1]===k)})).filter(x=>x.q)));
+  if(!d.length){toast("Die Fehler-Kiste ist leer 🎉");return}}
+ deck=d;idx=0;pts=0;maxPts=0;streak=0;bestStreak=0;gained=0;stat={};
+ ["home","end"].forEach(x=>$(x).classList.add("hide"));$("play").classList.remove("hide");show()}
+function addXp(n){st.xp+=n;gained+=n;save();$("xpNow").textContent="+"+gained+" XP"}
+function setStreak(ok){streak=ok?streak+1:0;bestStreak=Math.max(bestStreak,streak);$("streak").textContent=streak>=2?"🔥 "+streak+"er-Serie":"";if(ok&&streak>0&&streak%5===0){toast("🔥 "+streak+" richtig hintereinander!");confetti()}}
+function tally(cat,a,n){stat[cat]=stat[cat]||[0,0];stat[cat][0]+=a;stat[cat][1]+=n;pts+=a/n;maxPts+=1}
+function show(){$("prog").textContent=(idx+1)+" / "+deck.length;$("pbar").style.width=(idx/deck.length*100)+"%";$("xpNow").textContent=gained?"+"+gained+" XP":"";
+ const it=deck[idx];window.scrollTo(0,0);it.t==="hunt"?hunt(it.s):mc(it)}
+function next(){idx++;idx<deck.length?show():fin()}
+function nextBtn(){return '<button class="big" id="nx">'+(idx+1<deck.length?"Weiter →":"Ergebnis 🏆")+'</button>'}
 
-/* ---------- Fachbegriffe & Realien ---------- */
-const FACH=[
- ['Was bedeutet „Kasus“?','Fall','Zahl','Geschlecht','Zeit'],
- ['Was bedeutet „Numerus“?','Anzahl (Singular oder Plural)','Fall','Geschlecht','Zeitstufe'],
- ['Was bedeutet „Genus“?','grammatisches Geschlecht','Fall','Anzahl','Aussageweise'],
- ['Wofür steht KöNiG?','Kasus, Numerus, Genus','Konjugation, Nomen, Grammatik','Kasus, Nominativ, Genitiv','König, Numerus, Genus'],
- ['Welcher Fall ist der Nominativ?','1. Fall (Wer oder was?)','2. Fall (Wessen?)','3. Fall (Wem?)','4. Fall (Wen oder was?)'],
- ['Nach welchem Kasus fragt man mit „Wessen?“','Genitiv','Dativ','Akkusativ','Ablativ'],
- ['Nach welchem Kasus fragt man mit „Wem?“','Dativ','Genitiv','Akkusativ','Nominativ'],
- ['Nach welchem Kasus fragt man mit „Wen oder was?“','Akkusativ','Nominativ','Dativ','Ablativ'],
- ['Welchen Kasus gibt es im Lateinischen, aber nicht im Deutschen?','Ablativ','Akkusativ','Genitiv','Dativ'],
- ['Was ist ein Substantiv?','ein Nomen (Hauptwort), z. B. servus','ein Tätigkeitswort, z. B. vocare','ein Bindewort, z. B. et','ein Umstandswort, z. B. hodie'],
- ['Was ist ein Verb?','ein Tätigkeitswort, z. B. laudare','ein Hauptwort, z. B. villa','ein Verhältniswort, z. B. in','ein Eigenschaftswort, z. B. magnus'],
- ['Was ist eine Präposition?','ein Verhältniswort, z. B. in, cum, ad','ein Bindewort, z. B. et, sed','ein Umstandswort, z. B. diu','ein Hauptwort, z. B. via'],
- ['Was ist eine Konjunktion?','ein Bindewort, z. B. et, sed, quod','ein Verhältniswort, z. B. per','ein Hauptwort, z. B. forum','ein Umstandswort, z. B. tum'],
- ['Was ist ein Adverb?','ein Umstandswort, z. B. hodie, diu, statim','ein Eigenschaftswort, z. B. bonus','ein Bindewort, z. B. et','ein Verhältniswort, z. B. ex'],
- ['Was ist ein Adjektiv?','ein Eigenschaftswort, z. B. magnus, bonus','ein Umstandswort, z. B. heri','ein Tätigkeitswort, z. B. ridere','ein Verhältniswort, z. B. cum'],
- ['Was ist der Infinitiv?','die Grundform des Verbs, z. B. vocare','die Befehlsform, z. B. voca!','eine Vergangenheitsform, z. B. vocavi','die 1. Person Singular, z. B. voco'],
- ['Was ist der Imperativ?','die Befehlsform, z. B. audi! / audite!','die Wirklichkeitsform','die Grundform des Verbs','eine Vergangenheitsform'],
- ['Was ist der Indikativ?','der Wirklichkeitsmodus – „der normale Modus“','die Befehlsform','die Grundform des Verbs','eine Zeitform der Vergangenheit'],
- ['Was bedeutet „Tempus“?','Zeitform des Verbs, z. B. Präsens oder Perfekt','Fall eines Nomens','Anzahl','Aussageweise'],
- ['Was bedeutet „Modus“?','Aussageweise des Verbs, z. B. Indikativ oder Imperativ','Zeitform','Fall','Geschlecht'],
- ['Was ist das Perfekt?','eine Vergangenheitsform: „er hat gerufen“','die Gegenwart: „er ruft“','die Zukunft: „er wird rufen“','die Befehlsform: „ruf!“'],
- ['Was ist das Präsens?','die Gegenwart: „wir hören“','die Vergangenheit: „wir haben gehört“','die Befehlsform: „hört!“','die Grundform: „hören“'],
- ['Was zeigt die Personalendung eines Verbs an?','Person und Numerus – also wer handelt','den Kasus','das Genus','die Deklination'],
- ['Was bedeutet „Konjugation“?','das Beugen (Abwandeln) von Verben','das Beugen von Nomen','das Übersetzen eines Satzes','das Bestimmen der Satzglieder'],
- ['Was bedeutet „Deklination“?','das Beugen (Abwandeln) von Nomen','das Beugen von Verben','die Wortstellung im Satz','eine Zeitform'],
- ['Was bedeutet „Neutrum“?','sächliches Geschlecht','männliches Geschlecht','weibliches Geschlecht','Mehrzahl'],
- ['Was bedeutet „Maskulinum“?','männliches Geschlecht','weibliches Geschlecht','sächliches Geschlecht','Einzahl'],
- ['Was ist das Prädikat?','die Satzaussage (meist das Verb)','der Satzgegenstand','eine Umstandsbestimmung','eine nähere Bestimmung eines Nomens'],
- ['Was ist das Subjekt?','der Satzgegenstand (Wer oder was?)','die Satzaussage','eine Umstandsbestimmung','das Objekt im Dativ'],
- ['Was ist eine Adverbiale?','eine Umstandsbestimmung (Wo? Wann? Wie?)','der Satzgegenstand','die Satzaussage','eine Befehlsform'],
- ['Was bedeutet KNG-Kongruenz?','Das Adjektiv richtet sich in Kasus, Numerus und Genus nach seinem Nomen.','Adjektiv und Nomen haben immer die gleiche Endung.','Das Verb richtet sich nach dem Objekt.','Das Adjektiv steht immer vor dem Nomen.'],
- ['Haben Adjektiv und Nomen bei KNG-Kongruenz immer die gleiche Endung?','Nein – nur wenn sie zur gleichen Deklination gehören (magnos montes!).','Ja, immer.','Nur im Plural.','Nur im Nominativ.'],
- ['Was ist ein Prädikatsnomen?','ein Nomen oder Adjektiv, das „esse“ ergänzt (Forum magnum est.)','das Subjekt eines Satzes','ein Objekt im Dativ','ein Adverb der Zeit'],
- ['Was ist ein Adjektivattribut?','ein Adjektiv, das ein Nomen näher erläutert (magnos montes)','ein Adjektiv, das „esse“ ergänzt','ein eigenes Satzglied wie das Subjekt','ein Adverb'],
- ['Servus et serva miseri sunt. Warum steht miseri im Maskulinum Plural?','Bei Bezugswörtern, die maskulin und feminin sind, steht das Adjektiv im Maskulinum Plural.','Weil serva maskulin ist.','Weil das Adjektiv immer maskulin ist.','Weil sunt maskulin ist.'],
- ['Wo stehen lateinische Adjektive meistens?','hinter ihrem Nomen – Mengen- und Maßangaben (z. B. magnus, multi) oft davor','immer am Satzanfang','immer direkt vor dem Verb','immer am Satzende']
-];
-const REAL=[
- ['Was war das Forum Romanum?','der zentrale Platz Roms für Handel, Politik und Gerichte','ein großes Badehaus','eine Rennbahn für Wagenrennen','ein Landgut vor der Stadt'],
- ['Wo tagte der römische Senat?','in der Kurie (curia)','in den Thermen','im Circus Maximus','im Atrium'],
- ['Wozu diente eine Basilika im alten Rom?','als große Halle für Gerichte und Geschäfte','als Tempel für Jupiter','als Wohnhaus reicher Familien','als Arena für Gladiatoren'],
- ['Was sind Thermen?','öffentliche Badeanlagen','Tempel','Mietshäuser','Gerichtshallen'],
- ['Was fand im Circus Maximus statt?','Wagenrennen','Senatssitzungen','Gerichtsverhandlungen','Schulunterricht'],
- ['Wo kämpften Gladiatoren?','im Amphitheater, z. B. im Kolosseum','in der Kurie','in den Thermen','in der Basilika'],
- ['Was ist das Atrium?','die Eingangshalle eines römischen Hauses mit Öffnung im Dach','das Schlafzimmer','die Küche','der Garten hinter dem Haus'],
- ['Wer war der pater familias?','das Oberhaupt der Familie','der Hauslehrer','ein Priester','der älteste Sklave'],
- ['Was trug ein römischer Bürger zu offiziellen Anlässen?','die Toga','einen Helm','einen Fellmantel','eine Rüstung'],
- ['Wie lebten Sklaven in Rom?','unfrei, als Eigentum ihres Herrn – manche wurden freigelassen','als freie Bürger mit Stimmrecht','als Senatoren','als Priester im Tempel'],
- ['Welches Gründungsjahr Roms nennt die Sage?','753 v. Chr.','44 v. Chr.','476 n. Chr.','1000 v. Chr.'],
- ['Wer gründete Rom laut der Sage?','Romulus','Caesar','Augustus','Hannibal'],
- ['Was ist eine insula?','ein mehrstöckiges Mietshaus','ein Landgut','ein Tempel','ein Marktstand'],
- ['Worauf schrieben römische Schüler oft?','auf Wachstafeln mit einem Griffel (stilus)','auf Papier mit Füller','auf Leinwand','auf Glasplatten'],
- ['Was ist das caldarium in den Thermen?','das Warmbad','das Kaltbad','der Sportplatz','die Umkleide'],
- ['Was ist das frigidarium?','das Kaltbad','das Warmbad','das lauwarme Bad','die Bibliothek'],
- ['Was sind die Laren (lares)?','Schutzgötter des Hauses','Soldaten','Händler','Gladiatoren'],
- ['Was war der Senat?','der Rat erfahrener (ehemaliger) Beamter','eine Gruppe von Gladiatoren','die Sklaven eines Hauses','eine Mannschaft beim Wagenrennen'],
- ['Was bedeutet SPQR?','Senatus Populusque Romanus – Senat und Volk von Rom','Sei pünktlich, Quintus Rufus!','Sklaven, Priester, Quästoren, Richter','der Name eines Gottes'],
- /* Sagen der römischen Frühzeit (Lektion 12/13) */
- ['Wer war Horatius Cocles?','ein Held der römischen Frühzeit','der letzte König Roms','ein Gott der Etrusker','ein reicher Kaufmann'],
- ['Was tat Horatius Cocles der Sage nach?','Er verteidigte allein eine Brücke über den Tiber gegen die Feinde.','Er gründete die Stadt Rom.','Er baute das Kolosseum.','Er gewann ein Wagenrennen im Circus Maximus.'],
- ['Wer waren die Tusci?','die Etrusker, ein Volk nördlich von Rom (heute Toskana)','die Bewohner Griechenlands','die Sklaven in Rom','die Senatoren Roms'],
- ['Gegen wen kämpfte Horatius Cocles an der Brücke?','gegen die Etrusker','gegen die Griechen','gegen die Germanen','gegen Gladiatoren'],
- ['Wie hieß der letzte König Roms?','Tarquinius Superbus','Romulus','Augustus','Horatius Cocles'],
- ['Was bedeutet der Beiname „Superbus“?','der Stolze, der Überhebliche','der Gute','der Große','der Letzte'],
- ['Was geschah, nachdem die Römer ihren letzten König vertrieben hatten?','Rom wurde eine Republik.','Rom wurde von den Etruskern regiert.','Rom wurde zerstört.','Rom bekam einen Kaiser.'],
- ['Wer war Lucius Iunius Brutus?','ein Verschwörer gegen den König Tarquinius Superbus','der letzte König Roms','ein Held, der eine Brücke verteidigte','ein Gott der Römer']
-];
-const qList=(L,cat,p)=>()=>{const i=rnd(L.length),x=L[i];return mc(cat,p+i,x[0],x[1],x.slice(2),`Richtig ist: <b>${x[1]}</b>`)};
-const qFach=qList(FACH,'Grammatische Fachbegriffe','f'), qReal=qList(REAL,'Realienkunde','r');
+/* ---------- Multiple Choice (Wissens-Mix & Blitz) ---------- */
+function mkBlitz(){const s=SENT[Math.random()*SENT.length|0];let ci;do{ci=Math.random()*s.parts.length|0}while(s.parts[ci][1]==="K"&&Math.random()<.7);return{s,ci}}
+function mc(it){$("pal").classList.add("hide");let cat,q,opts,right,expl,html=false;
+ if(it.t==="blitz"){const p=it.s.parts[it.ci];cat="⚡ Blitz-Bestimmung";right=p[1];expl=p[2];
+  q='<div class="plain">'+it.s.parts.map((x,k)=>k===it.ci?'<span class="blitzword" id="bw">'+esc(x[0].replace(/,$/,""))+'</span>'+(x[0].endsWith(",")?",":""):esc(x[0])).join(" ")+'.</div>Welches Satzglied ist das <b>markierte</b>?';html=true;
+  opts=ORDER.map(k=>[k,k==="K"?LAB[k].name:LAB[k].name+" ("+LAB[k].short+")"]);}
+ else{const x=it.q;cat=x[0];q=esc(x[1]);right=x[2][0];expl=x[3];opts=sh(x[2]).map(o=>[o,o]);}
+ $("stage").innerHTML='<div class="cat">'+cat+'</div><div class="q">'+q+'</div><div id="opts"></div><div id="fbx"></div>';
+ opts.forEach(([v,t])=>{const b=document.createElement("button");b.className="opt";b.dataset.v=v;
+  if(it.t==="blitz"){b.style.borderLeft="8px solid "+col(v)}
+  b.textContent=t;b.onclick=()=>{
+   const ok=v===right;[...$("opts").children].forEach(o=>{o.disabled=true;if(o.dataset.v===right)o.classList.add("ok")});
+   if(!ok)b.classList.add("ko");else b.classList.add("pop");
+   setStreak(ok);addXp(ok?10+(streak>=3?5:0):0);
+   const c=it.t==="blitz"?"Satzglieder":cat;tally(c,ok?1:0,1);
+   if(it.t==="blitz"){const bw=$("bw");bw.className="m-"+right;bw.style.cssText="--c:"+col(right)+";font-weight:700;padding:0 3px;"+(ok?"":"background:color-mix(in srgb,var(--ko) 14%,transparent);border-radius:6px");
+    if(!ok&&!st.missS.includes(it.s.id))st.missS.push(it.s.id)}
+   else{const k=it.q[1];if(ok)st.missQ=st.missQ.filter(z=>z!==k);else if(!st.missQ.includes(k))st.missQ.push(k)}
+   save();
+   const extra=it.t==="blitz"?(ok?"":"Du hast "+lt(v,1)+" gewählt → richtig ist "+lt(right)+"<br>")+"<b>"+LAB[right].q+"</b> "+esc(expl)+'<div class="de">'+esc(it.s.de)+"</div>":esc(expl);
+   $("fbx").innerHTML='<div class="fb '+(ok?"good":"bad")+'"><b>'+(ok?["Richtig! 🎉","Optime! 💪","Bene! ⭐","Klasse! 🏛️"][Math.random()*4|0]:"Leider falsch.")+'</b><br>'+extra+'</div>'+nextBtn();
+   $("nx").onclick=next;$("nx").scrollIntoView({behavior:"smooth",block:"nearest"})};
+  $("opts").append(b)})}
 
-/* ---------- Stationen ---------- */
-const GEN_DEKL=[[qKoenig,4],[qKNG,2],[qBilde,2],[qEndung,2],[qDekl,1]];
-const GEN_VERB=[[qVerbDe,3],[qVerbBest,3],[qVerbLat,2],[qVerbEnd,2]];
-const GEN_SATZ=[[qSatzRole,3],[qSatzFind,2]];
-const STATIONS=[
- {id:'basilica',lat:'Basilica',de:'Deklinationen',sub:'KöNiG bestimmen, KNG-Kongruenz, Formen bilden, Endungen der Basilika',gen:()=>weighted(GEN_DEKL)},
- {id:'officina',lat:'Officina',de:'Verben',sub:'Personalendungen: Präsens, Imperativ, Perfekt',gen:()=>weighted(GEN_VERB)},
- {id:'curia',lat:'Curia',de:'Satzglieder',sub:'Handlungsmodell: Subjekt, Prädikat, Objekt, Adverbiale, Attribut',gen:()=>weighted(GEN_SATZ)},
- {id:'bibliotheca',lat:'Bibliotheca',de:'Vokabeln',sub:'Lektion 12 & 13, Wortbildung und Grundwortschatz',gen:()=>weighted([[qVoc,5],[qWort,1]])},
- {id:'schola',lat:'Schola',de:'Fachbegriffe',sub:'Kasus, Modus, Tempus & Co.',gen:qFach},
- {id:'forum',lat:'Forum',de:'Realienkunde',sub:'Leben im alten Rom',gen:qReal},
- {id:'triumphus',lat:'Triumphus',de:'Generalprobe für die Klassenarbeit',sub:'20 gemischte Fragen aus allen Stationen',n:20,
-   gen:()=>weighted([[()=>weighted(GEN_DEKL),4],[()=>weighted(GEN_VERB),4],[()=>weighted(GEN_SATZ),3],[qVoc,3],[qFach,2],[qReal,2]])}
-];
-function buildRound(st){const n=st.n||10,qs=[],keys=new Set();let t=0;
-  while(qs.length<n&&t++<400){const q=st.gen();if(keys.has(q.key))continue;keys.add(q.key);qs.push(q)}return qs}
+/* ---------- Satzglied-Jagd ---------- */
+let active=null,marks=[],words=[],hintUsed=false,checked=false;
+function tokens(s){const out=[];s.parts.forEach((p,ci)=>{const ws=p[0].split(" ");ws.forEach((w,wi)=>{let punct="";if(w.endsWith(",")){punct=",";w=w.slice(0,-1)}
+  const alt=[p[1]];
+  if(w.toLowerCase()==="et"){if(p[1]!=="K")alt.push("K");else{const a=s.parts[ci-1],b=s.parts[ci+1];if(a&&b&&a[1]===b[1])alt.push(a[1])}}
+  out.push({w,lab:p[1],alt,ci,punct})})});return out}
+function hunt(s){active=null;hintUsed=false;checked=false;words=tokens(s);marks=words.map(()=>null);
+ $("stage").innerHTML='<div class="cat">🎯 Satzglied-Jagd · '+esc(s.title)+'</div><div class="q" style="font-size:16px;font-weight:500">Wähle unten ein Satzglied und tippe dann alle Wörter an, die dazugehören.</div><div class="sent" id="sent"></div>'+
+ '<div class="acts"><button class="big ghost" id="hintB">💡 Tipp: Gruppen zeigen</button><button class="big" id="chk" disabled></button></div><div id="hres"></div>';
+ const sent=$("sent");let g=null,lastCi=-1;
+ words.forEach((t,i)=>{if(t.ci!==lastCi){g=document.createElement("span");g.className="grp";sent.append(g);lastCi=t.ci}
+  const d=document.createElement("span");d.className="wd";d.innerHTML='<span class="tp"></span><button class="w">'+esc(t.w)+'</button><span class="tg"></span>';
+  d.querySelector(".w").onclick=()=>tap(i,d);g.append(d);
+  if(t.punct){const p=document.createElement("span");p.className="punct";p.textContent=t.punct;g.append(p)}
+  t.el=d});
+ sent.lastChild.insertAdjacentHTML("beforeend",'<span class="punct">.</span>');
+ $("hintB").onclick=()=>{if(checked)return;hintUsed=true;sent.classList.add("showgrp");$("hintB").disabled=true;$("hintB").textContent="💡 Gruppen sichtbar"};
+ $("chk").onclick=check;palette();upd()}
+function palette(){$("pal").classList.remove("hide");
+ $("pbtns").innerHTML=ORDER.map(k=>'<button class="pb'+(active===k?" on":"")+'" data-k="'+k+'" style="--c:'+col(k)+'"><b>'+LAB[k].short+'</b>'+PQ[k]+'</button>').join("")+'<button class="pb era'+(active==="X"?" on":"")+'" data-k="X"><b>⌫</b>löschen</button>';
+ [...$("pbtns").children].forEach(b=>b.onclick=()=>{if(checked)return;active=b.dataset.k;palette()});
+ $("palHint").innerHTML=active?(active==="X"?"Tippe Wörter an, um die Markierung zu löschen":"Jetzt alle Wörter für <b style='color:"+col(active)+"'>"+LAB[active].name+"</b> antippen"):"🧭 Tipp: Kreise zuerst die Bindewörter ein, dann such das <b style='color:var(--L-P)'>Prädikat</b>!"}
+function tap(i,d){if(checked)return;const b=d.querySelector(".w");
+ if(!active){b.classList.add("shake");setTimeout(()=>b.classList.remove("shake"),400);toast("Wähle zuerst unten ein Satzglied 👇");return}
+ marks[i]=(active==="X"||marks[i]===active)?null:active;paint(i);b.classList.add("pop");setTimeout(()=>b.classList.remove("pop"),260);upd()}
+function paint(i){const d=words[i].el,b=d.querySelector(".w"),k=marks[i];b.className="w"+(k?" sel m-"+k:"");b.style.cssText=k?"--c:"+col(k):"";
+ const tg=d.querySelector(".tg");tg.style.cssText=k?"--c:"+col(k):"";tg.textContent=k?LAB[k].short:""}
+function upd(){const left=marks.filter(m=>!m).length;$("chk").disabled=!!left;$("chk").textContent=left?"Noch "+left+" Wort"+(left>1?"e":"")+" offen":"✔ Prüfen"}
+function check(){checked=true;$("pal").classList.add("hide");$("sent").classList.add("showgrp");$("hintB").classList.add("hide");$("chk").classList.add("hide");
+ const s=deck[idx].s;let good=0;const wrongCi=new Map();
+ words.forEach((t,i)=>{const ok=t.alt.includes(marks[i]);if(ok)good++;else if(!wrongCi.has(t.ci))wrongCi.set(t.ci,[]);if(!ok)wrongCi.get(t.ci).push([t.w,marks[i]]);
+  const d=t.el,b=d.querySelector(".w"),k=ok?marks[i]:t.lab;d.classList.add(ok?"ok":"ko");
+  b.className="w m-"+k;b.style.cssText="--c:"+col(k);
+  d.querySelector(".tp").textContent=ok?"✓":LAB[marks[i]].short;
+  const tg=d.querySelector(".tg");tg.style.cssText="--c:"+col(k);tg.textContent=LAB[k].short});
+ const n=words.length,perfect=good===n;
+ const stars=perfect?(hintUsed?2:3):good/n>=.7?2:good/n>=.4?1:0;
+ addXp(good*2+(perfect&&!hintUsed?10:0));setStreak(perfect);tally("Satzglieder",good,n);
+ if(perfect)st.missS=st.missS.filter(z=>z!==s.id);else if(!st.missS.includes(s.id))st.missS.push(s.id);save();
+ if(stars===3)confetti();
+ let h='<div class="stars">'+"⭐".repeat(stars)+"☆".repeat(3-stars)+'</div><div style="text-align:center;font-weight:700">'+good+" von "+n+" Wörtern richtig"+(perfect?" – perfekt! 🎉":"")+'</div>';
+ if(wrongCi.size){h+='<div class="fb bad" style="margin-top:12px"><b>Das war noch falsch:</b>';
+  wrongCi.forEach((ws,ci)=>{const p=s.parts[ci];h+='<div class="err"><div><i style="font-family:Georgia">'+esc(ws.map(x=>x[0]).join(" "))+'</i>: du hattest '+[...new Set(ws.map(x=>x[1]))].map(k=>lt(k,1)).join(" ")+' → richtig '+lt(p[1])+'<br><span class="sub" style="color:var(--tx)"><b>'+LAB[p[1]].q+'</b> '+esc(p[2])+'</span></div></div>'});h+='</div>'}
+ h+='<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">📖 Alle Satzglieder erklärt</summary>'+s.parts.map(p=>'<div class="err"><div>'+lt(p[1])+' <i style="font-family:Georgia">'+esc(p[0].replace(/,$/,""))+'</i> – '+esc(p[2])+'</div></div>').join("")+'</details>';
+ h+='<div class="de">🇩🇪 '+esc(s.de)+'</div>'+nextBtn();$("hres").innerHTML=h;$("nx").onclick=next}
 
-/* ---------- Zustand & Anzeige ---------- */
-const app=document.getElementById('app');
-let S={view:'home'};
-const RIGHT=['Optime!','Bene!','Recte!','Euge!','Bene fecisti!'], WRONG=['Heu!','Non recte.','Erravisti.'];
-const starsHTML=n=>`<span class="stars" aria-label="${n} von 3 Sternen">${'★'.repeat(n)}<i>${'★'.repeat(3-n)}</i></span>`;
-function header(){
-  return `<header class="top"><button class="brand" data-act="home" aria-label="Zur Übersicht"><b>Latein·Arena</b><span>Lateintraining · Lektion 12 &amp; 13</span></button>
-  <div class="purse" title="Gesammelte Denare"><span class="coin">D</span>${store.get('denarii',0)} <small>Denare</small></div></header><div class="mosaic"></div>`;
-}
-function homeView(){
-  const best=store.get('best',{});
-  const cd='Res bene eveniat – viel Erfolg bei der Klassenarbeit!';
-  return `<div class="lead"><h1>Salve!</h1><p class="note">${cd} Wähle eine Station. Jede richtige Antwort bringt Denare, eine Serie bringt Bonus.</p></div>
-  <div class="grid">${STATIONS.map(s=>{const b=best[s.id];return `<button class="st${s.n?' big':''}" data-act="start" data-id="${s.id}">
-     <span class="lat">${s.lat}</span><span class="de">${s.de}</span><span class="sub">${s.sub}</span>
-     <span class="rec"><span>${b?`Rekord: ${b.pct}%`:'Noch nicht gespielt'}</span>${starsHTML(b?b.stars:0)}</span></button>`}).join('')}</div>
-  <div class="tools"><button class="btn" data-act="tafel">Spickzettel: Basilika & Endungen</button><button class="btn" data-act="own">Eigene Vokabeln (${ownVoc().length})</button></div>
-  <p class="foot">Tipp vom Lernplan: Jeden Tag ein bisschen lernen, nicht an einem Tag „alles“. Erst im Kopf überlegen, dann mit dem Spickzettel absichern.<br>
-  Die Vokabeln aus Lektion 12 und 13 (Buch S. 44–47) sind eingebaut und kommen am häufigsten dran. Fehlt noch etwas, trag es unter „Eigene Vokabeln“ ein.</p>`;
-}
-function quizView(){
-  const q=S.qs[S.i],n=S.qs.length;
-  let body='';
-  if(q.type==='mc'){
-    body=`<div class="opts${q.opts.length>3&&!q.long?' two':''}">${q.opts.map((o,i)=>{
-      let c='opt'+(q.lat?' lat':'');if(S.done){c+=i===q.ans?' right':i===S.last.idx?' wrong':' dim'}
-      return `<button class="${c}" data-act="pick" data-i="${i}" ${S.done?'disabled':''}><kbd>${i+1}</kbd><span>${o}</span></button>`}).join('')}</div>`;
-  }else{
-    const sel=S.sel,row=(k,arr,vals)=>arr.map((l,i)=>`<button class="sb${sel[k]===vals[i]?' on':''}" data-act="sel" data-k="${k}" data-v="${vals[i]}" ${S.done?'disabled':''}>${l}</button>`).join('');
-    body=`<div class="seg"><h3><b>K</b>asus</h3><div class="segrow">${row('c',KAS,[0,1,2,3,4])}</div></div>
-      <div class="seg"><h3><b>N</b>umerus</h3><div class="segrow">${row('n',NUM,[0,1])}</div></div>
-      <div class="seg"><h3><b>G</b>enus</h3><div class="segrow">${row('g',['Maskulinum','Femininum','Neutrum'],['m','f','n'])}</div></div>
-      ${S.done?'':`<div class="next"><button class="btn pri" data-act="check" ${sel.c==null||sel.n==null||!sel.g?'disabled':''}>Prüfen</button></div>`}`;
-  }
-  let fb='';
-  if(S.done){const L=S.last;
-    fb=`<div class="fb ${L.ok?'ok':'no'}" role="status"><h3>${L.ok?pick(RIGHT):pick(WRONG)} <small>${L.ok?`+${L.pts} Denare`:'Richtig wäre: '+(q.type==='mc'?q.opts[q.ans]:q.solution)}</small></h3><p>${q.explain}</p></div>
-    <div class="next"><button class="btn pri" data-act="next" id="nextbtn">${S.i+1<n?'Weiter':'Zum Ergebnis'}</button></div>`;}
-  return `<div class="qbar"><button class="btn" data-act="home">← Übersicht</button><span class="where">${S.st.lat}</span>
-    <span class="chip${S.streak>=3?' hot':''}">Serie ${S.streak}</span><span class="chip">${S.i+1} / ${n}</span></div>
-    <div class="prog"><i style="width:${(S.i+(S.done?1:0))/n*100}%"></i></div>
-    <section class="card"><div class="cat">${q.cat}</div><div class="prompt">${q.prompt}</div>${body}${fb}</section>
-    <p class="keys">Tastatur: Ziffern 1–5 zum Antworten, Enter für „Weiter“.</p>`;
-}
-const RANKS=[[100,'Imperator','Feldherr – perfekt!'],[80,'Legatus','Legionskommandant – sehr stark!'],[60,'Centurio','Hauptmann – gut gemacht!'],[40,'Miles','Soldat – weiter trainieren!'],[0,'Tiro','Rekrut – nicht aufgeben, gleich nochmal!']];
-function resultView(){
-  const n=S.qs.length,pct=Math.round(S.right/n*100),r=RANKS.find(x=>pct>=x[0]),stars=pct>=90?3:pct>=70?2:pct>=50?1:0;
-  return `<section class="card res"><div class="cat">${S.st.lat} · ${S.st.de}</div><div class="rank">${r[1]}</div><div class="rde">${r[2]}</div>${starsHTML(stars)}
-    <div class="nums"><div><b>${S.right}/${n}</b>richtig</div><div><b>${S.score}</b>Denare</div><div><b>${S.maxStreak}</b>beste Serie</div></div>
-    <div class="tools"><button class="btn pri" data-act="start" data-id="${S.st.id}">Neue Runde</button>${S.wrong.length?`<button class="btn" data-act="retry">Fehler nochmal üben (${S.wrong.length})</button>`:''}<button class="btn" data-act="home">Übersicht</button></div></section>
-    ${S.wrong.length?`<div class="miss"><h2>Das solltest du dir nochmal anschauen</h2>${S.wrong.map(w=>`<div class="mi">${w.q.prompt}<br><span class="your">Deine Antwort: ${w.your}</span><br>${w.q.explain}</div>`).join('')}</div>`:''}`;
-}
-function tafelView(){
-  const ex=Object.keys(TABLES).map(k=>{const n=NOUNS.find(x=>x.t===k),f=forms(n),T=TABLES[k];
-    const cell=i=>T.end[i]===''?f[i]:`${n.st}<b>${T.end[i]}</b>`;
-    return `<div class="tbox"><h3>${T.name}</h3><div class="scroll"><table><tr><th></th><th>Singular</th><th>Plural</th></tr>
-      ${KAS.map((K,c)=>`<tr><th>${KAS_S[c]}</th><td>${cell(c)}</td><td>${cell(c+5)}</td></tr>`).join('')}</table></div></div>`}).join('');
-  const AF=adjForms(ADJ[0]),ae=(g,i)=>`magn<b>${AF[g][i].slice(4)}</b>`;
-  const adjTable=`<table><tr><th></th><th>Sg. m</th><th>Sg. f</th><th>Sg. n</th><th>Pl. m</th><th>Pl. f</th><th>Pl. n</th></tr>
-    ${KAS_S.map((K,c)=>`<tr><th>${K}</th>${['m','f','n'].map(g=>`<td>${ae(g,c)}</td>`).join('')}${['m','f','n'].map(g=>`<td>${ae(g,c+5)}</td>`).join('')}</tr>`).join('')}</table>`;
-  const vs=['vocare','monere','audire','mittere','esse'].map(i=>VERBS.find(v=>v.inf===i)),vf=vs.map(vforms);
-  const pres=`<table><tr><th></th>${vs.map(v=>`<th>${v.inf}</th>`).join('')}</tr>${PRON.map((p,i)=>`<tr><th>${p}</th>${vf.map(f=>`<td>${f[i].f}</td>`).join('')}</tr>`).join('')}
-    <tr><th>Imp. Sg.</th>${vf.map(f=>`<td>${f[6].f}!</td>`).join('')}</tr><tr><th>Imp. Pl.</th>${vf.map(f=>`<td>${f[7].f}!</td>`).join('')}</tr></table>`;
-  const perf=`<table><tr><th></th>${vs.map(v=>`<th>${v.inf}</th>`).join('')}</tr>${PRON.map((p,i)=>`<tr><th>${p}</th>${vs.map(v=>`<td>${v.pf}<b>${PERF[i]}</b></td>`).join('')}</tr>`).join('')}</table>`;
-  return `<div class="qbar"><button class="btn" data-act="home">← Übersicht</button><span class="where">Spickzettel</span></div>
-  <h2 class="sec">Deklinationenbasilika</h2><div class="tgrid">${ex}</div>
-  <p class="note" style="margin-top:10px">KöNiG = <b>K</b>asus, <b>N</b>umerus, <b>G</b>enus. Neutrum-Regel: Nominativ und Akkusativ sind immer gleich, im Plural enden sie auf <b>-a</b>.</p>
-  <h2 class="sec">Adjektive: magnus, -a, -um</h2><div class="tbox scroll">${adjTable}</div>
-  <p class="note" style="margin-top:10px">KNG-Kongruenz: Das Adjektiv richtet sich in Kasus, Numerus und Genus nach seinem Nomen. Die Endungen sind nur gleich, wenn beide zur gleichen Deklination gehören: <i>magna templa</i>, aber <i>magnos montes</i>. Adjektive auf -er (miser, misera, miserum) gehen wie puer.</p>
-  <h2 class="sec">Präsens und Imperativ</h2><div class="tbox scroll">${pres}</div>
-  <p class="note" style="margin-top:10px">Personalendungen Präsens: -o/-m, -s, -t, -mus, -tis, -nt · Imperativ: Stamm! / Stamm + -te!</p>
-  <h2 class="sec">Perfekt</h2><div class="tbox scroll">${perf}</div>
-  <p class="note" style="margin-top:10px">Perfektendungen: -i, -isti, -it, -imus, -istis, -erunt (an den Perfektstamm).</p>
-  <h2 class="sec">Satzglieder: So fragst du</h2><div class="rq">${['S','P','O','D','A','T','N'].map(r=>`<div><b>${ROLES[r]}</b> – ${RQ[r]}</div>`).join('')}</div>`;
-}
-function ownView(){
-  const own=ownVoc();
-  return `<div class="qbar"><button class="btn" data-act="home">← Übersicht</button><span class="where">Eigene Vokabeln</span></div>
-  <section class="card"><p class="note" style="margin-bottom:12px">Trage hier Vokabeln aus Lektion 12 und 13 ein – eine pro Zeile, Latein und Deutsch getrennt durch „=“. Sie landen dann in der Bibliotheca und in der Generalprobe. Gespeichert wird nur in diesem Browser.</p>
-  <label for="owntext" class="cat">Deine Vokabeln</label>
-  <textarea id="owntext" placeholder="nuntius, -i m = Bote&#10;timere = fürchten&#10;postea = später">${esc(own.map(x=>x[0]+' = '+x[1]).join('\n'))}</textarea>
-  <label class="chk"><input type="checkbox" id="ownonly" ${store.get('ownOnly',false)?'checked':''}> Nur meine eigenen Vokabeln abfragen (ab 4 Wörtern)</label>
-  <div class="next"><span id="savemsg" class="ok-msg" aria-live="polite"></span><button class="btn pri" data-act="saveown">Speichern</button></div></section>`;
-}
-function render(){
-  const v={home:homeView,quiz:quizView,result:resultView,tafel:tafelView,own:ownView}[S.view];
-  app.innerHTML=header()+v();
-  if(S.view==='quiz'&&S.done){const b=document.getElementById('nextbtn');b&&b.focus({preventScroll:true})}
-}
-function go(view){S={view};render();window.scrollTo(0,0)}
-function start(id,qs){const st=STATIONS.find(s=>s.id===id);
-  S={view:'quiz',st,qs:qs||buildRound(st),i:0,score:0,streak:0,maxStreak:0,right:0,wrong:[],done:false,sel:{}};render();window.scrollTo(0,0)}
-function finish(ok,your,idx){
-  const q=S.qs[S.i];S.done=true;let pts=0;
-  if(ok){S.streak++;S.maxStreak=Math.max(S.maxStreak,S.streak);pts=10+Math.min(S.streak-1,5)*2;S.score+=pts;S.right++;store.set('denarii',store.get('denarii',0)+pts)}
-  else{S.streak=0;S.wrong.push({q,your})}
-  S.last={ok,pts,idx};render();
-}
-function next(){
-  S.i++;S.done=false;S.sel={};
-  if(S.i>=S.qs.length){
-    const pct=Math.round(S.right/S.qs.length*100),stars=pct>=90?3:pct>=70?2:pct>=50?1:0,best=store.get('best',{});
-    if(!S.retry&&(!best[S.st.id]||best[S.st.id].pct<pct)){best[S.st.id]={pct,stars};store.set('best',best)}
-    S.view='result';
-  }
-  render();window.scrollTo(0,0);
-}
-app.addEventListener('click',e=>{
-  const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act;
-  if(a==='home')go('home');
-  else if(a==='tafel')go('tafel');
-  else if(a==='own')go('own');
-  else if(a==='start')start(b.dataset.id);
-  else if(a==='retry'){const st=S.st,qs=shuffle(S.wrong.map(w=>w.q));start(st.id,qs);S.retry=true}
-  else if(a==='pick'&&!S.done){const i=+b.dataset.i,q=S.qs[S.i];finish(i===q.ans,q.opts[i],i)}
-  else if(a==='sel'&&!S.done){const k=b.dataset.k;S.sel[k]=k==='g'?b.dataset.v:+b.dataset.v;render()}
-  else if(a==='check'&&!S.done){const q=S.qs[S.i],s=S.sel;
-    const ok=q.valid.some(v=>v.c===s.c&&v.n===s.n&&v.g===s.g);finish(ok,`${KAS[s.c]} ${NUM[s.n]} · ${GEN_L[s.g]}`)}
-  else if(a==='next')next();
-  else if(a==='saveown'){
-    const lines=document.getElementById('owntext').value.split('\n').map(l=>l.trim()).filter(Boolean);
-    const list=[];lines.forEach(l=>{const m=l.match(/^(.+?)\s*(?:=|\t|;| - | – )\s*(.+)$/);if(m)list.push([m[1].trim(),m[2].trim(),'own'])});
-    store.set('own',list);store.set('ownOnly',document.getElementById('ownonly').checked);
-    document.getElementById('savemsg').textContent=`${list.length} Vokabeln gespeichert.`;
-  }
-});
-document.addEventListener('keydown',e=>{
-  if(S.view!=='quiz'||/TEXTAREA|INPUT/.test(document.activeElement?.tagName||''))return;
-  const q=S.qs[S.i];
-  if(!S.done&&q.type==='mc'&&/^[1-9]$/.test(e.key)){const i=+e.key-1;if(i<q.opts.length){e.preventDefault();finish(i===q.ans,q.opts[i],i)}}
-  else if(S.done&&e.key==='Enter'){e.preventDefault();next()}
-});
-render();
-</script>
+/* ---------- Ende ---------- */
+function fin(){$("play").classList.add("hide");$("pal").classList.add("hide");$("end").classList.remove("hide");
+ const p=maxPts?Math.round(pts/maxPts*100):0;
+ $("endIco").textContent=p>=90?"🏆":p>=70?"🥈":p>=50?"💪":"📚";
+ $("res").textContent=p+" % richtig";
+ $("resSub").innerHTML="+"+gained+" XP"+(bestStreak>=3?" · beste Serie: 🔥 "+bestStreak:"")+"<br>"+(p>=90?"Optime! Du bist bereit für die KA!":p>=70?"Bene! Noch ein bisschen üben, dann sitzt es.":"Nicht aufgeben – schau in die Fehler-Kiste und den Spickzettel!");
+ $("bycat").innerHTML="<b>Nach Themen</b>"+Object.entries(stat).map(([c,[a,n]])=>'<div class="row"><span>'+c+'</span><span>'+a+" / "+n+'</span></div><div class="bar"><i style="width:'+(a/n*100)+'%"></i></div>').join("");
+ if(p>=80)confetti();const before=rank();}
+$("again").onclick=()=>startRound(lastMode);
+$("toHome").onclick=$("quit").onclick=()=>{["play","end"].forEach(x=>$(x).classList.add("hide"));$("pal").classList.add("hide");$("home").classList.remove("hide");rank()};
+
+/* ---------- Menü ---------- */
+const cats=[...new Set(Q.map(x=>x[0]))];let sel=new Set(cats);
+function chips(){$("chips").innerHTML="";cats.forEach(c=>{const b=document.createElement("button");b.className="chip"+(sel.has(c)?" on":"");b.textContent=c;b.onclick=()=>{sel.has(c)?sel.delete(c):sel.add(c);chips()};$("chips").append(b)});
+ $("cnt").textContent=Q.filter(x=>sel.has(x[0])).length+" Fragen im Topf · 12 pro Runde";$("mixGo").disabled=!sel.size}
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{const m=b.dataset.go;if(m==="mix"){$("mixSel").classList.toggle("hide");chips();$("mixSel").scrollIntoView({behavior:"smooth"})}else startRound(m)});
+$("mixGo").onclick=()=>startRound("mix");
+rank();
+</script></body></html>
